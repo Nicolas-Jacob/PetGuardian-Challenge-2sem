@@ -11,18 +11,19 @@ const PET_KEY = "@petguardian_pet";
 export async function savePet(
     pet: Pet
 ) {
-
     try {
         await AsyncStorage.setItem(
             PET_KEY,
             JSON.stringify(pet)
         );
+        return true;
     }
     catch (error) {
         console.log(
             "Erro ao salvar:",
             error
         );
+        return false;
     }
 }
 
@@ -32,13 +33,27 @@ export async function getPet() {
             await AsyncStorage.getItem(
                 PET_KEY
             );
-        return data
-            ? JSON.parse(data)
-            : null;
+        if (data) {
+            return JSON.parse(data);
+        }
+        return null;
     }
+    catch (error) {
+        console.log(
+            "Erro ao buscar:",
+            error
+        );
+        return null;
+    }
+}
 
+export async function removePet() {
+    try {
+        await AsyncStorage.removeItem(
+            PET_KEY
+        );
+    }
     catch (error) {
         console.log(error);
-        return null;
     }
 }
