@@ -10,29 +10,43 @@ export default function CustomButton({
     title,
     onPress
 }: Props) {
+
     return (
-        <TouchableOpacity style={styles.button} onPress={onPress}>
+        <TouchableOpacity
+            style={styles.button}
+            activeOpacity={0.8}
+            onPress={onPress}
+        >
             <Text style={styles.text}>
                 {title}
             </Text>
         </TouchableOpacity>
-    )
+    );
 
 }
 
-const styles =
-    StyleSheet.create({
-        button: {
-            backgroundColor:
-            COLORS.primary,
-            padding: 15,
-            borderRadius: 12,
-            marginVertical: 10
-        },
+const styles = StyleSheet.create({
+    button: {
+        backgroundColor: COLORS.primary,
+        paddingVertical: 16,
+        borderRadius: 15,
+        marginVertical: 8,
 
-        text: {
-            color: "#fff",
-            fontWeight: "bold",
-            textAlign: "center"
-        }
-    })
+        shadowColor: COLORS.shadow,
+        shadowOffset: {
+            width: 0,
+            height: 4
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+
+        elevation: 5
+    },
+
+    text: {
+        color: COLORS.white,
+        fontWeight: "bold",
+        fontSize: 16,
+        textAlign: "center"
+    }
+});

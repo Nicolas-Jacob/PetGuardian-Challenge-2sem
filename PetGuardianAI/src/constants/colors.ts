@@ -5,6 +5,9 @@ export const COLORS = {
     white: "#FFFFFF",
     text: "#1E293B",
     gray: "#64748B",
+    lightGray: "#E2E8F0",
     success: "#22C55E",
-    danger: "#EF4444"
+    danger: "#EF4444",
+    card: "#FFFFFF",
+    shadow: "#00000020"
 };

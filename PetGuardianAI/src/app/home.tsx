@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useState, useCallback } from "react";
 import { router, useFocusEffect } from "expo-router";
 import { Pet, getPet } from "../storage/storage";
@@ -7,6 +7,7 @@ import CustomButton from "../components/CustomButton";
 import { COLORS } from "../constants/colors";
 
 export default function Home() {
+
     const [pet, setPet] = useState<Pet | null>(null);
 
     async function loadPet() {
@@ -14,39 +15,82 @@ export default function Home() {
         setPet(data);
     }
 
-    useFocusEffect(useCallback(() => {
-        loadPet();
-    }, []));
+    useFocusEffect(
+        useCallback(() => {
+            loadPet();
+        }, [])
+    );
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Dashboard</Text>
+        <ScrollView contentContainerStyle={styles.container}>
+
+            <Text style={styles.title}>
+                Dashboard
+            </Text>
+
+            <Text style={styles.subtitle}>
+                Gerencie informações do seu pet
+            </Text>
+
             {pet ? (
                 <PetCard pet={pet} />
             ) : (
-                <Text style={styles.emptyText}>Nenhum pet cadastrado</Text>
+                <View style={styles.emptyCard}>
+                    <Text style={styles.emptyText}>
+                        Nenhum pet cadastrado
+                    </Text>
+                </View>
             )}
-            <CustomButton title="Cadastrar Pet" onPress={() => router.push("/addPet")} />
-            <CustomButton title="Histórico" onPress={() => router.push("/history")} />
-            <CustomButton title="Chat IA" onPress={() => router.push("/chat")} />
-        </View>
+
+            <CustomButton
+                title="Cadastrar Pet"
+                onPress={() => router.push("/addPet")}
+            />
+
+            <CustomButton
+                title="Histórico Clínico"
+                onPress={() => router.push("/history")}
+            />
+
+            <CustomButton
+                title="Chat IA"
+                onPress={() => router.push("/chat")}
+            />
+
+        </ScrollView>
     );
+
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         padding: 20,
         backgroundColor: COLORS.background,
+        flexGrow: 1
     },
+
     title: {
-        fontSize: 28,
+        fontSize: 30,
         fontWeight: "bold",
-        marginBottom: 20,
+        marginTop: 20,
+        color: COLORS.text
     },
-    emptyText: {
-        fontSize: 16,
-        marginBottom: 20,
+
+    subtitle: {
+        fontSize: 15,
         color: COLORS.gray,
+        marginBottom: 20
     },
+
+    emptyCard: {
+        backgroundColor: COLORS.card,
+        padding: 20,
+        borderRadius: 15,
+        marginVertical: 20
+    },
+
+    emptyText: {
+        textAlign: "center",
+        color: COLORS.gray
+    }
 });
