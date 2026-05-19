@@ -1,71 +1,71 @@
-import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
-import { useState } from "react";
-import { router } from "expo-router";
-import { savePet } from "../storage/storage";
-import CustomButton from "../components/CustomButton";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import { COLORS } from "../constants/colors";
 
-export default function AddPet() {
-    const [name, setName] = useState("");
-    const [species, setSpecies] = useState("");
-    const [age, setAge] = useState("");
-
-    async function handleSave() {
-        if (!name.trim() || !species.trim() || !age.trim()) {
-            Alert.alert("Erro", "Preencha todos os campos");
-            return;
-        }
-
-        if (isNaN(Number(age))) {
-            Alert.alert("Erro", "Digite uma idade válida");
-            return;
-        }
-
-        const success = await savePet({ name, species, age });
-
-        if (success) {
-            Alert.alert("Sucesso", "Pet cadastrado");
-            setName("");
-            setSpecies("");
-            setAge("");
-            router.back();
-        }
+const historyData = [
+    {
+        id:"1",
+        title:"Vacinação",
+        date:"10/05/2026"
+    },
+    {
+        id:"2",
+        title:"Consulta veterinária",
+        date:"14/05/2026"
+    },
+    {
+        id:"3",
+        title:"Exame preventivo",
+        date:"16/05/2026"
     }
+];
 
+export default function History() {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Cadastrar Pet</Text>
-            <TextInput style={styles.input} placeholder="Nome do pet" value={name} onChangeText={setName} />
-            <TextInput style={styles.input} placeholder="Espécie" value={species} onChangeText={setSpecies} />
-            <TextInput style={styles.input} placeholder="Idade" value={age} onChangeText={setAge} keyboardType="numeric" />
-            <Text style={styles.preview}>Preview em tempo real</Text>
-            <Text>Nome: {name}</Text>
-            <Text>Espécie: {species}</Text>
-            <Text>Idade: {age}</Text>
-            <CustomButton title="Salvar" onPress={handleSave} />
+            <Text style={styles.title}>
+                Histórico Clínico
+            </Text>
+
+            <FlatList data={historyData} keyExtractor={(item)=>item.id} renderItem={({item})=>(
+                    <View style={styles.card}>
+
+                        <Text style={styles.cardTitle}>
+                            {item.title}
+                        </Text>
+
+                        <Text style={styles.cardDate}>
+                            {item.date}
+                        </Text>
+                    </View>
+                )}
+            />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: COLORS.background,
+    container:{
+        flex:1,
+        padding:20,
+        backgroundColor:COLORS.background
     },
-    title: {
-        fontSize: 28,
-        fontWeight: "bold",
-        marginBottom: 20,
+    title:{
+        fontSize:28,
+        fontWeight:"bold",
+        marginBottom:20
     },
-    input: {
-        backgroundColor: "#fff",
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 15,
+    card:{
+        backgroundColor:COLORS.card,
+        padding:20,
+        borderRadius:15,
+        marginBottom:15
     },
-    preview: {
-        fontWeight: "bold",
-        marginVertical: 15,
+    cardTitle:{
+        fontWeight:"bold",
+        fontSize:16
     },
+    cardDate:{
+        marginTop:8,
+        color:COLORS.gray
+    }
 });
