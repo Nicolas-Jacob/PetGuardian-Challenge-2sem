@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet } from "react-native";
-
 import { Pet } from "../storage/storage";
 import { COLORS } from "../constants/colors";
 

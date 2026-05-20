@@ -1,10 +1,9 @@
 import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
-
 import { savePet } from "../storage/storage";
-
 import CustomButton from "../components/CustomButton";
+import BackButton from "../components/BackButton";
 import { COLORS } from "../constants/colors";
 
 export default function AddPet() {
@@ -16,18 +15,12 @@ export default function AddPet() {
     async function handleSave() {
 
         if (!name.trim() || !species.trim() || !age.trim()) {
-            Alert.alert(
-                "Erro",
-                "Preencha todos os campos"
-            );
+            Alert.alert("Erro", "Preencha todos os campos");
             return;
         }
 
         if (isNaN(Number(age))) {
-            Alert.alert(
-                "Erro",
-                "Digite uma idade válida"
-            );
+            Alert.alert("Erro", "Digite uma idade válida");
             return;
         }
 
@@ -43,7 +36,6 @@ export default function AddPet() {
                 "Sucesso",
                 "Pet cadastrado com sucesso"
             );
-
             setName("");
             setSpecies("");
             setAge("");
@@ -54,7 +46,7 @@ export default function AddPet() {
 
     return (
         <View style={styles.container}>
-
+            <BackButton />
             <Text style={styles.title}>
                 Cadastrar Pet
             </Text>

@@ -1,15 +1,8 @@
 import { View, Text, TextInput, StyleSheet, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
-
-import {
-    getPets,
-    saveHistory,
-    getHistory,
-    Pet,
-    HistoryRecord
-} from "../storage/storage";
-
+import { getPets, saveHistory, getHistory, Pet, HistoryRecord } from "../storage/storage";
 import CustomButton from "../components/CustomButton";
+import BackButton from "../components/BackButton";
 import { COLORS } from "../constants/colors";
 
 export default function History() {
@@ -19,64 +12,45 @@ export default function History() {
     const [selectedPet, setSelectedPet] = useState("");
     const [description, setDescription] = useState("");
 
-    const [screen, setScreen] =
-        useState<"menu" | "view" | "create">(
-            "menu"
-        );
+    const [screen, setScreen] = useState<"menu" | "view" | "create">("menu");
 
-    function isSelected(
-        petName: string
-    ) {
-
+    function isSelected(petName: string) {
         return selectedPet === petName;
     }
 
     async function loadData() {
-        const petData =
-            await getPets();
-
-        const historyData =
-            await getHistory();
+        const petData = await getPets();
+        const historyData = await getHistory();
 
         setPets(petData);
         setHistory(historyData);
     }
 
     async function handleSave() {
-        if (
-            !selectedPet ||
-            !description.trim()
-        ) {
+        if (!selectedPet || !description.trim()) {
             return;
         }
 
-        const success =
-            await saveHistory({
-
-                petName: selectedPet,
-                description,
-                date:
-                    new Date()
-                        .toLocaleDateString()
-            });
+        const success = await saveHistory({
+            petName: selectedPet,
+            description,
+            date: new Date().toLocaleDateString()
+        });
 
         if (success) {
             setDescription("");
             loadData();
-            setScreen(
-                "menu"
-            );
+            setScreen("menu");
         }
     }
 
     useEffect(() => {
-
         loadData();
-
     }, []);
 
     return (
         <ScrollView style={styles.container}>
+            <BackButton />
             <Text style={styles.title}>
                 Histórico Clínico
             </Text>
@@ -92,7 +66,6 @@ export default function History() {
                         title="Nova Ação Clínica"
                         onPress={() => setScreen("create")}
                     />
-
                 </>
             )}
             {screen === "view" && (
@@ -107,23 +80,19 @@ export default function History() {
                                 title={pet.name}
                                 onPress={() => setSelectedPet(pet.name)}
                             />
-
                             {isSelected(pet.name) && (
-
                                 <View style={styles.selectedCard}>
 
                                     <Text style={styles.selectedText}>
                                         Pet selecionado: {pet.name}
                                     </Text>
-
                                 </View>
                             )}
                         </View>
                     ))}
+
                     {history
-                        .filter(item =>
-                            item.petName === selectedPet
-                        )
+                        .filter(item => item.petName === selectedPet)
                         .map((item, index) => (
                             <View
                                 key={index}
@@ -137,20 +106,21 @@ export default function History() {
                                 <Text>
                                     {item.date}
                                 </Text>
-
                             </View>
                         ))}
                     <CustomButton
-                        title="Voltar"
+                        title="Menu"
                         onPress={() => setScreen("menu")}
                     />
                 </>
             )}
+
             {screen === "create" && (
                 <>
                     <Text style={styles.subtitle}>
                         Escolha o pet
                     </Text>
+
                     {pets.map((pet) => (
                         <View key={pet.name}>
                             <CustomButton
@@ -183,7 +153,7 @@ export default function History() {
                     />
 
                     <CustomButton
-                        title="Voltar"
+                        title="Menu"
                         onPress={() => setScreen("menu")}
                     />
                 </>

@@ -1,12 +1,9 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useState, useCallback } from "react";
 import { router, useFocusEffect } from "expo-router";
-
 import { Pet, getPets } from "../storage/storage";
-
 import PetCard from "../components/PetCard";
 import CustomButton from "../components/CustomButton";
-
 import { COLORS } from "../constants/colors";
 
 export default function Home() {
