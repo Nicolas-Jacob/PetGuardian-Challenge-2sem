@@ -4,7 +4,6 @@ import CustomButton from "../components/CustomButton";
 import { COLORS } from "../constants/colors";
 
 export default function Login() {
-
     return (
         <View style={styles.container}>
 
@@ -27,7 +26,6 @@ export default function Login() {
 
         </View>
     );
-
 }
 
 const styles = StyleSheet.create({

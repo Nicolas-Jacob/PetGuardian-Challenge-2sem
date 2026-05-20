@@ -1,11 +1,14 @@
 import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
+
 import { savePet } from "../storage/storage";
+
 import CustomButton from "../components/CustomButton";
 import { COLORS } from "../constants/colors";
 
 export default function AddPet() {
+
     const [name, setName] = useState("");
     const [species, setSpecies] = useState("");
     const [age, setAge] = useState("");
@@ -50,7 +53,6 @@ export default function AddPet() {
     }
 
     return (
-
         <View style={styles.container}>
 
             <Text style={styles.title}>
@@ -85,17 +87,9 @@ export default function AddPet() {
                     Preview
                 </Text>
 
-                <Text>
-                    Nome: {name || "-"}
-                </Text>
-
-                <Text>
-                    Espécie: {species || "-"}
-                </Text>
-
-                <Text>
-                    Idade: {age || "-"}
-                </Text>
+                <Text>Nome: {name || "-"}</Text>
+                <Text>Espécie: {species || "-"}</Text>
+                <Text>Idade: {age || "-"}</Text>
 
             </View>
 
@@ -108,29 +102,32 @@ export default function AddPet() {
 }
 
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
         padding: 20,
         backgroundColor: COLORS.background
     },
+
     title: {
         fontSize: 28,
         fontWeight: "bold",
         marginBottom: 25
     },
+
     input: {
         backgroundColor: COLORS.white,
         padding: 15,
         borderRadius: 12,
         marginBottom: 15
     },
+
     previewCard: {
         backgroundColor: COLORS.card,
         padding: 20,
         borderRadius: 15,
         marginVertical: 20
     },
+
     previewTitle: {
         fontWeight: "bold",
         marginBottom: 10

@@ -6,7 +6,14 @@ export interface Pet {
     age: string;
 }
 
+export interface HistoryRecord {
+    petName: string;
+    description: string;
+    date: string;
+}
+
 const PET_KEY = "@petguardian_pet";
+const HISTORY_KEY = "@petguardian_history";
 
 export async function savePet(
     pet: Pet
@@ -30,12 +37,10 @@ export async function savePet(
         return true;
 
     } catch (error) {
-
         console.log(
             "Erro ao salvar pet:",
             error
         );
-
         return false;
     }
 }
@@ -43,37 +48,73 @@ export async function savePet(
 export async function getPets(): Promise<Pet[]> {
 
     try {
-
         const data =
             await AsyncStorage.getItem(
                 PET_KEY
             );
 
-        if (!data) {
-            return [];
-        }
+        if (!data) return [];
 
         const parsedData =
             JSON.parse(data);
 
-        if (
-            Array.isArray(
-                parsedData
-            )
-        ) {
-            return parsedData;
-        }
-
-        return [
-            parsedData
-        ];
+        return Array.isArray(parsedData)
+            ? parsedData
+            : [parsedData];
 
     } catch (error) {
-
         console.log(
             "Erro ao buscar pets:",
             error
         );
+        return [];
+    }
+}
+
+export async function saveHistory(
+    history: HistoryRecord
+): Promise<boolean> {
+
+    try {
+        const existingHistory =
+            await getHistory();
+
+        const updatedHistory = [
+            ...existingHistory,
+            history
+        ];
+
+        await AsyncStorage.setItem(
+            HISTORY_KEY,
+            JSON.stringify(updatedHistory)
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.log(
+            "Erro ao salvar histórico:",
+            error
+        );
+        return false;
+    }
+}
+
+export async function getHistory():
+Promise<HistoryRecord[]> {
+
+    try {
+        const data =
+            await AsyncStorage.getItem(
+                HISTORY_KEY
+            );
+
+        if (!data) return [];
+
+        return JSON.parse(data);
+
+    } catch {
 
         return [];
     }
@@ -84,14 +125,10 @@ export async function removePet(
 ): Promise<boolean> {
 
     try {
-
         const pets =
             await getPets();
 
-        pets.splice(
-            index,
-            1
-        );
+        pets.splice(index, 1);
 
         await AsyncStorage.setItem(
             PET_KEY,
@@ -99,26 +136,6 @@ export async function removePet(
         );
 
         return true;
-
-    } catch (error) {
-
-        console.log(
-            "Erro ao remover:",
-            error
-        );
-
-        return false;
-    }
-}
-
-export async function petExists(): Promise<boolean> {
-
-    try {
-
-        const pets =
-            await getPets();
-
-        return pets.length > 0;
 
     } catch {
 

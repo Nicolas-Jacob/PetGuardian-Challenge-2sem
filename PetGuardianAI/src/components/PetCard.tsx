@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
+
 import { Pet } from "../storage/storage";
 import { COLORS } from "../constants/colors";
 
@@ -9,7 +10,6 @@ interface Props {
 export default function PetCard({
     pet
 }: Props) {
-
     return (
         <View style={styles.card}>
 
@@ -36,13 +36,12 @@ export default function PetCard({
                     {pet.age} anos
                 </Text>
             </View>
-
         </View>
     );
-
 }
 
 const styles = StyleSheet.create({
+
     card: {
         backgroundColor: COLORS.card,
         padding: 20,
@@ -54,9 +53,9 @@ const styles = StyleSheet.create({
             width: 0,
             height: 5
         },
+
         shadowOpacity: 0.2,
         shadowRadius: 5,
-
         elevation: 6
     },
 
