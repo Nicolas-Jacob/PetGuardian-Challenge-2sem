@@ -13,15 +13,24 @@ export async function savePet(
 ): Promise<boolean> {
 
     try {
-        const petData = JSON.stringify(pet);
+
+        const existingPets =
+            await getPets();
+
+        const updatedPets = [
+            ...existingPets,
+            pet
+        ];
 
         await AsyncStorage.setItem(
             PET_KEY,
-            petData
+            JSON.stringify(updatedPets)
         );
+
         return true;
 
     } catch (error) {
+
         console.log(
             "Erro ao salvar pet:",
             error
@@ -31,56 +40,88 @@ export async function savePet(
     }
 }
 
-export async function getPet(): Promise<Pet | null> {
+export async function getPets(): Promise<Pet[]> {
 
     try {
+
         const data =
             await AsyncStorage.getItem(
                 PET_KEY
             );
 
         if (!data) {
-            return null;
+            return [];
         }
-        return JSON.parse(data);
+
+        const parsedData =
+            JSON.parse(data);
+
+        if (
+            Array.isArray(
+                parsedData
+            )
+        ) {
+            return parsedData;
+        }
+
+        return [
+            parsedData
+        ];
 
     } catch (error) {
+
         console.log(
-            "Erro ao buscar pet:",
+            "Erro ao buscar pets:",
             error
         );
-        return null;
+
+        return [];
     }
 }
 
-export async function removePet(): Promise<boolean> {
+export async function removePet(
+    index: number
+): Promise<boolean> {
 
     try {
-        await AsyncStorage.removeItem(
-            PET_KEY
+
+        const pets =
+            await getPets();
+
+        pets.splice(
+            index,
+            1
         );
+
+        await AsyncStorage.setItem(
+            PET_KEY,
+            JSON.stringify(pets)
+        );
+
         return true;
 
     } catch (error) {
+
         console.log(
-            "Erro ao remover pet:",
+            "Erro ao remover:",
             error
         );
+
         return false;
     }
 }
 
 export async function petExists(): Promise<boolean> {
+
     try {
 
-        const data =
-            await AsyncStorage.getItem(
-                PET_KEY
-            );
+        const pets =
+            await getPets();
 
-        return !!data;
+        return pets.length > 0;
 
     } catch {
+
         return false;
     }
 }
