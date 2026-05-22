@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TextInput, StyleSheet, ScrollView, Pressable } from "react-native";
 import { useState, useEffect } from "react";
 import { getPets, saveHistory, getHistory, Pet, HistoryRecord } from "../storage/storage";
 import CustomButton from "../components/CustomButton";
@@ -11,7 +11,6 @@ export default function History() {
     const [history, setHistory] = useState<HistoryRecord[]>([]);
     const [selectedPet, setSelectedPet] = useState("");
     const [description, setDescription] = useState("");
-
     const [screen, setScreen] = useState<"menu" | "view" | "create">("menu");
 
     function isSelected(petName: string) {
@@ -27,6 +26,7 @@ export default function History() {
     }
 
     async function handleSave() {
+
         if (!selectedPet || !description.trim()) {
             return;
         }
@@ -51,6 +51,7 @@ export default function History() {
     return (
         <ScrollView style={styles.container}>
             <BackButton />
+
             <Text style={styles.title}>
                 Histórico Clínico
             </Text>
@@ -70,6 +71,7 @@ export default function History() {
                     />
                 </>
             )}
+
             {screen === "view" && (
                 <>
                     <Text style={styles.subtitle}>
@@ -77,20 +79,22 @@ export default function History() {
                     </Text>
 
                     {pets.map((pet) => (
-                        <View key={pet.name}>
-                            <CustomButton
-                                title={pet.name}
-                                onPress={() => setSelectedPet(pet.name)}
-                            />
-                            {isSelected(pet.name) && (
-                                <View style={styles.selectedCard}>
+                        <Pressable
+                            key={pet.name}
+                            onPress={() => setSelectedPet(pet.name)}
+                            style={[
+                                styles.petSelector,
+                                isSelected(pet.name) && styles.selectedPet
+                            ]}
+                        >
+                            <Text style={styles.petName}>
+                                🐾 {pet.name}
+                            </Text>
 
-                                    <Text style={styles.selectedText}>
-                                        Pet selecionado: {pet.name}
-                                    </Text>
-                                </View>
-                            )}
-                        </View>
+                            <Text style={styles.petInfo}>
+                                {pet.species} • {pet.age} anos
+                            </Text>
+                        </Pressable>
                     ))}
 
                     {history
@@ -100,7 +104,6 @@ export default function History() {
                                 key={index}
                                 style={styles.card}
                             >
-
                                 <Text style={styles.recordTitle}>
                                     {item.description}
                                 </Text>
@@ -110,6 +113,7 @@ export default function History() {
                                 </Text>
                             </View>
                         ))}
+
                     <CustomButton
                         title="Menu"
                         onPress={() => setScreen("menu")}
@@ -124,24 +128,24 @@ export default function History() {
                     </Text>
 
                     {pets.map((pet) => (
-                        <View key={pet.name}>
-                            <CustomButton
-                                title={pet.name}
-                                onPress={() => setSelectedPet(pet.name)}
-                            />
+                        <Pressable
+                            key={pet.name}
+                            onPress={() => setSelectedPet(pet.name)}
+                            style={[
+                                styles.petSelector,
+                                isSelected(pet.name) && styles.selectedPet
+                            ]}
+                        >
+                            <Text style={styles.petName}>
+                                🐾 {pet.name}
+                            </Text>
 
-                            {isSelected(pet.name) && (
-
-                                <View style={styles.selectedCard}>
-
-                                    <Text style={styles.selectedText}>
-                                        Pet selecionado: {pet.name}
-                                    </Text>
-
-                                </View>
-                            )}
-                        </View>
+                            <Text style={styles.petInfo}>
+                                {pet.species} • {pet.age} anos
+                            </Text>
+                        </Pressable>
                     ))}
+
                     <TextInput
                         style={styles.input}
                         placeholder="Ex: Vacina V10 aplicada"
@@ -202,16 +206,40 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
 
-    selectedCard: {
-        backgroundColor: COLORS.primary,
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 15
+    petSelector: {
+        backgroundColor: COLORS.card,
+        padding: 18,
+        borderRadius: 15,
+        marginBottom: 12,
+
+        borderWidth: 2,
+        borderColor: "transparent",
+
+        shadowColor: COLORS.shadow,
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3
     },
 
-    selectedText: {
-        color: COLORS.white,
+    selectedPet: {
+        borderColor: "#2196F3",
+        backgroundColor: "#E3F2FD",
+        shadowOpacity: 0.35,
+        elevation: 6
+    },
+
+    petName: {
+        fontSize: 16,
         fontWeight: "bold",
-        textAlign: "center"
+        color: COLORS.text
+    },
+
+    petInfo: {
+        marginTop: 5,
+        color: COLORS.gray
     }
 });
