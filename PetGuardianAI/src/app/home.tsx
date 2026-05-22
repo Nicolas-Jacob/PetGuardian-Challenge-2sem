@@ -56,18 +56,22 @@ export default function Home() {
 
             <CustomButton
                 title="Cadastrar Pet"
+                backgroundColor="#4CAF50"
                 onPress={() => router.push("/addPet")}
             />
 
             <CustomButton
                 title="Histórico Clínico"
+                backgroundColor="#FF9800"
                 onPress={() => router.push("/history")}
             />
 
             <CustomButton
                 title="Chat IA"
+                backgroundColor="#9C27B0"
                 onPress={() => router.push("/chat")}
             />
+
         </ScrollView>
     );
 }

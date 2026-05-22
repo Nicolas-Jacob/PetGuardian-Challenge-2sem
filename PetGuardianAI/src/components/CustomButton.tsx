@@ -4,16 +4,21 @@ import { COLORS } from "../constants/colors";
 interface Props {
     title: string;
     onPress: () => void;
+    backgroundColor?: string;
 }
 
 export default function CustomButton({
     title,
-    onPress
+    onPress,
+    backgroundColor = COLORS.primary
 }: Props) {
 
     return (
         <TouchableOpacity
-            style={styles.button}
+            style={[
+                styles.button,
+                { backgroundColor }
+            ]}
             activeOpacity={0.8}
             onPress={onPress}
         >
@@ -22,12 +27,10 @@ export default function CustomButton({
             </Text>
         </TouchableOpacity>
     );
-
 }
 
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: COLORS.primary,
         paddingVertical: 16,
         borderRadius: 15,
         marginVertical: 8,
@@ -39,7 +42,6 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.3,
         shadowRadius: 5,
-
         elevation: 5
     },
 

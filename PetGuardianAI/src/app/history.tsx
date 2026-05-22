@@ -59,11 +59,13 @@ export default function History() {
                 <>
                     <CustomButton
                         title="Ver Histórico Clínico"
+                        backgroundColor="#2196F3"
                         onPress={() => setScreen("view")}
                     />
 
                     <CustomButton
                         title="Nova Ação Clínica"
+                        backgroundColor="#E91E63"
                         onPress={() => setScreen("create")}
                     />
                 </>
