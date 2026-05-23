@@ -18,10 +18,10 @@ O sistema foi criado visando melhorar a organização dos cuidados dos animais e
 
 O aplicativo possui as seguintes funcionalidades:
 
-### 🔐 Login
+### 🏠 Tela Inicial
 
-- Tela inicial do aplicativo
-- Entrada para o sistema
+- Entrada do aplicativo
+- Acesso às funcionalidades do sistema
 
 ### 🐾 Cadastro de Pet
 
@@ -36,38 +36,49 @@ Possui:
 - Validação dos campos
 - Verificação de dados inválidos
 - Preview em tempo real
+- Cadastro de múltiplos pets
 
 ### 📋 Dashboard
 
 Permite:
 
-- Visualizar informações do pet cadastrado
-- Navegar entre as funcionalidades
+- Visualizar informações dos pets cadastrados
+- Navegar entre funcionalidades
+- Exibir múltiplos pets
 
 ### 🏥 Histórico Clínico
 
-Permite visualizar:
+Permite:
 
-- Vacinação
-- Consultas veterinárias
-- Exames preventivos
+- Criar novas ações clínicas
+- Selecionar um pet específico
+- Registrar vacinas
+- Registrar consultas
+- Registrar exames
+- Visualizar histórico individual de cada pet
 
 ### 🤖 Chat IA Simulado
 
-Possui respostas automáticas para perguntas relacionadas a:
+Possui respostas automáticas sobre:
 
-- Vacinas
+- Vacinação
 - Alimentação
 - Hidratação
-- Recomendações preventivas
+- Banhos
+- Consultas veterinárias
+- Vômitos
+- Cansaço
+- Falta de apetite
+- Perguntas frequentes
 
 ### 💾 Persistência Local
 
 Utilizando AsyncStorage:
 
-- Salvar dados do pet
-- Buscar dados salvos
-- Remover informações
+- Salvar múltiplos pets
+- Recuperar pets cadastrados
+- Salvar históricos clínicos
+- Restaurar dados após reiniciar o aplicativo
 
 ---
 
@@ -127,7 +138,7 @@ Antes de iniciar, é necessário possuir instalado:
 
 Download:
 
-https://nodejs.org/
+:contentReference[oaicite:0]{index=0}
 
 Verificar instalação:
 
@@ -140,15 +151,15 @@ npm -v
 
 ### Expo Go
 
-Instalar no celular o app Expo Go:
+Instalar no celular o aplicativo Expo Go.
 
 Android:
 
-https://play.google.com/store/apps/details?id=host.exp.exponent
+:contentReference[oaicite:1]{index=1}
 
 iOS:
 
-https://apps.apple.com/app/expo-go/id982107779
+:contentReference[oaicite:2]{index=2}
 
 ---
 
@@ -157,7 +168,7 @@ https://apps.apple.com/app/expo-go/id982107779
 ## 1 Clonar o repositório
 
 ```bash
-git clone LINK_DO_REPOSITORIO
+git clone https://github.com/2TDSPX/challenge12-guardianpet.git
 ```
 
 ---
@@ -165,7 +176,7 @@ git clone LINK_DO_REPOSITORIO
 ## 2 Entrar na pasta do projeto
 
 ```bash
-cd PetGuardianAI
+cd challenge12-guardianpet/PetGuardianAI
 ```
 
 ---
@@ -173,65 +184,46 @@ cd PetGuardianAI
 ## 3 Instalar dependências
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 ---
 
-## 4 Iniciar projeto
+## 4 Iniciar o projeto
 
 ```bash
-npx expo start
+npx expo start -c
 ```
 
 ---
 
 ## 5 Executar no celular
 
-Abrir aplicativo Expo Go.
-
-Escanear QR Code exibido no terminal.
+- Abrir o aplicativo Expo Go
+- Escanear o QR Code exibido no terminal
+- Aguardar carregamento do aplicativo
 
 ---
 
 # 👨‍💻 Integrantes
 
 ### Nícolas de Oliveira Jacob
-
 RM: 564205
-
 Turma: 2TDPX
 
----
 
 ### João Victor Vendramente
-
 RM: 563665
-
 Turma: 2TDSPV
-
----
 
 ### Gabriel Ambrósio Saraiva
-
 RM: 566552
-
 Turma: 2TDSPV
 
----
-
 ### Vinicius Romaguera Cardozo
-
 RM: 562308
-
 Turma: 2TDPX
 
----
-
 ### Yuri Fuzinatto Garzoli Barreto
-
-RM: 56140
-
+RM: 561450
 Turma: 2TDSPX
-
----
