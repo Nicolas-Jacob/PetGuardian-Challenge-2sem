@@ -4,7 +4,6 @@ import { COLORS } from "../constants/colors";
 
 export default function BackButton() {
     return (
-
         <TouchableOpacity
             style={styles.button}
             activeOpacity={0.8}
@@ -24,6 +23,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 12,
+        marginTop: 35,
         marginBottom: 20,
 
         shadowColor: COLORS.shadow,
@@ -31,7 +31,6 @@ const styles = StyleSheet.create({
             width: 0,
             height: 2
         },
-
         shadowOpacity: 0.2,
         shadowRadius: 4,
 
