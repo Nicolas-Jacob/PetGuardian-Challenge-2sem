@@ -1,3 +1,7 @@
+# Vídeo YouTube
+
+https://www.youtube.com/watch?v=vu3WBKNJnTE
+
 # 🐾 PetGuardian AI
 
 Aplicativo mobile desenvolvido em React Native com Expo para acompanhamento preventivo de pets, permitindo cadastro, histórico clínico e interação com um chat inteligente.
