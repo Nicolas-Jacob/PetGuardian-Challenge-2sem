@@ -4,9 +4,13 @@ import { router } from "expo-router";
 import CustomButton from "../components/CustomButton";
 import BackButton from "../components/BackButton";
 import { COLORS } from "../constants/colors";
+import { SPACING, RADIUS } from "../constants/spacing";
+import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 import { useAuth } from "../contexts/AuthContext";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type FocusableField = "email" | "password" | "confirmPassword";
 
 export default function Register() {
 
@@ -16,6 +20,7 @@ export default function Register() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [focusedField, setFocusedField] = useState<FocusableField | null>(null);
 
     async function handleRegister() {
 
@@ -68,33 +73,67 @@ export default function Register() {
                 Cadastre-se para começar a cuidar dos seus pets
             </Text>
 
-            <TextInput
-                style={styles.input}
-                placeholder="E-mail"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={!loading}
-            />
+            <View style={styles.form}>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Senha"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                editable={!loading}
-            />
+                <Text style={styles.label}>
+                    E-mail
+                </Text>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Confirmar senha"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                editable={!loading}
-            />
+                <TextInput
+                    style={[
+                        styles.input,
+                        focusedField === "email" && styles.inputFocused
+                    ]}
+                    placeholder="seu@email.com"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={email}
+                    onChangeText={setEmail}
+                    onFocus={() => setFocusedField("email")}
+                    onBlur={() => setFocusedField(null)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    editable={!loading}
+                />
+
+                <Text style={styles.label}>
+                    Senha
+                </Text>
+
+                <TextInput
+                    style={[
+                        styles.input,
+                        focusedField === "password" && styles.inputFocused
+                    ]}
+                    placeholder="Mínimo 6 caracteres"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={password}
+                    onChangeText={setPassword}
+                    onFocus={() => setFocusedField("password")}
+                    onBlur={() => setFocusedField(null)}
+                    secureTextEntry
+                    editable={!loading}
+                />
+
+                <Text style={styles.label}>
+                    Confirmar senha
+                </Text>
+
+                <TextInput
+                    style={[
+                        styles.input,
+                        focusedField === "confirmPassword" && styles.inputFocused
+                    ]}
+                    placeholder="Repita a senha"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    onFocus={() => setFocusedField("confirmPassword")}
+                    onBlur={() => setFocusedField(null)}
+                    secureTextEntry
+                    editable={!loading}
+                />
+
+            </View>
 
             <CustomButton
                 title="Cadastrar"
@@ -108,7 +147,10 @@ export default function Register() {
                     if (!loading) router.push("/login");
                 }}
             >
-                Já tem conta? Entrar
+                Já tem conta?{" "}
+                <Text style={styles.linkHighlight}>
+                    Entrar
+                </Text>
             </Text>
 
         </View>
@@ -118,35 +160,61 @@ export default function Register() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 25,
+        padding: SPACING.xl,
         backgroundColor: COLORS.background
     },
 
     title: {
-        fontSize: 28,
-        fontWeight: "bold",
+        fontSize: TYPOGRAPHY.title.fontSize,
+        fontWeight: TYPOGRAPHY.title.fontWeight,
         color: COLORS.primary,
-        marginBottom: 10
+        marginBottom: SPACING.xs
     },
 
     subtitle: {
-        fontSize: 15,
-        color: COLORS.gray,
-        marginBottom: 30,
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary,
+        marginBottom: SPACING.xl,
         lineHeight: 22
     },
 
+    form: {
+        marginBottom: SPACING.xs
+    },
+
+    label: {
+        fontSize: FONT_SIZE.caption,
+        fontWeight: FONT_WEIGHT.semibold,
+        color: COLORS.textSecondary,
+        marginBottom: SPACING.xs,
+        marginLeft: SPACING.xs
+    },
+
     input: {
-        backgroundColor: COLORS.white,
-        padding: 15,
-        borderRadius: 12,
-        marginBottom: 15
+        backgroundColor: COLORS.card,
+        borderWidth: 1.5,
+        borderColor: COLORS.border,
+        padding: SPACING.md,
+        borderRadius: RADIUS.md,
+        marginBottom: SPACING.md,
+        fontSize: FONT_SIZE.body,
+        color: COLORS.text
+    },
+
+    inputFocused: {
+        borderColor: COLORS.primary,
+        backgroundColor: COLORS.primaryMuted
     },
 
     link: {
         textAlign: "center",
-        marginTop: 20,
+        marginTop: SPACING.md,
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary
+    },
+
+    linkHighlight: {
         color: COLORS.primary,
-        fontWeight: "bold"
+        fontWeight: FONT_WEIGHT.bold
     }
 });

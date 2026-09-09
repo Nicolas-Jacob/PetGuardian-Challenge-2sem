@@ -3,6 +3,8 @@ import { useState } from "react";
 import { router } from "expo-router";
 import CustomButton from "../components/CustomButton";
 import { COLORS } from "../constants/colors";
+import { SPACING, RADIUS } from "../constants/spacing";
+import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 import { useAuth } from "../contexts/AuthContext";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,6 +16,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [focusedField, setFocusedField] = useState<"email" | "password" | null>(null);
 
     async function handleLogin() {
 
@@ -47,9 +50,11 @@ export default function Login() {
     return (
         <View style={styles.container}>
 
-            <Text style={styles.logo}>
-                🐾
-            </Text>
+            <View style={styles.logoWrapper}>
+                <Text style={styles.logo}>
+                    🐾
+                </Text>
+            </View>
 
             <Text style={styles.title}>
                 PetGuardian AI
@@ -59,24 +64,48 @@ export default function Login() {
                 Seu assistente inteligente para cuidados preventivos do seu pet
             </Text>
 
-            <TextInput
-                style={styles.input}
-                placeholder="E-mail"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={!loading}
-            />
+            <View style={styles.form}>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Senha"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                editable={!loading}
-            />
+                <Text style={styles.label}>
+                    E-mail
+                </Text>
+
+                <TextInput
+                    style={[
+                        styles.input,
+                        focusedField === "email" && styles.inputFocused
+                    ]}
+                    placeholder="seu@email.com"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={email}
+                    onChangeText={setEmail}
+                    onFocus={() => setFocusedField("email")}
+                    onBlur={() => setFocusedField(null)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    editable={!loading}
+                />
+
+                <Text style={styles.label}>
+                    Senha
+                </Text>
+
+                <TextInput
+                    style={[
+                        styles.input,
+                        focusedField === "password" && styles.inputFocused
+                    ]}
+                    placeholder="Sua senha"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={password}
+                    onChangeText={setPassword}
+                    onFocus={() => setFocusedField("password")}
+                    onBlur={() => setFocusedField(null)}
+                    secureTextEntry
+                    editable={!loading}
+                />
+
+            </View>
 
             <CustomButton
                 title="Entrar"
@@ -90,7 +119,10 @@ export default function Login() {
                     if (!loading) router.push("/register");
                 }}
             >
-                Não tem conta? Cadastre-se
+                Não tem conta?{" "}
+                <Text style={styles.linkHighlight}>
+                    Cadastre-se
+                </Text>
             </Text>
 
         </View>
@@ -101,43 +133,78 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
-        padding: 25,
+        padding: SPACING.xl,
         backgroundColor: COLORS.background
     },
 
+    logoWrapper: {
+        alignSelf: "center",
+        width: 88,
+        height: 88,
+        borderRadius: RADIUS.full,
+        backgroundColor: COLORS.primaryMuted,
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: SPACING.lg
+    },
+
     logo: {
-        fontSize: 60,
-        textAlign: "center",
-        marginBottom: 20
+        fontSize: 44
     },
 
     title: {
-        fontSize: 35,
-        fontWeight: "bold",
+        fontSize: TYPOGRAPHY.largeTitle.fontSize,
+        fontWeight: TYPOGRAPHY.largeTitle.fontWeight,
         textAlign: "center",
         color: COLORS.primary
     },
 
     subtitle: {
         textAlign: "center",
-        fontSize: 15,
-        marginTop: 15,
-        marginBottom: 35,
-        color: COLORS.gray,
+        fontSize: FONT_SIZE.body,
+        marginTop: SPACING.sm,
+        marginBottom: SPACING.xl,
+        color: COLORS.textSecondary,
         lineHeight: 22
     },
 
+    form: {
+        marginBottom: SPACING.xs
+    },
+
+    label: {
+        fontSize: FONT_SIZE.caption,
+        fontWeight: FONT_WEIGHT.semibold,
+        color: COLORS.textSecondary,
+        marginBottom: SPACING.xs,
+        marginLeft: SPACING.xs
+    },
+
     input: {
-        backgroundColor: COLORS.white,
-        padding: 15,
-        borderRadius: 12,
-        marginBottom: 15
+        backgroundColor: COLORS.card,
+        borderWidth: 1.5,
+        borderColor: COLORS.border,
+        padding: SPACING.md,
+        borderRadius: RADIUS.md,
+        marginBottom: SPACING.md,
+        fontSize: FONT_SIZE.body,
+        color: COLORS.text
+    },
+
+    inputFocused: {
+        borderColor: COLORS.primary,
+        backgroundColor: COLORS.primaryMuted
     },
 
     link: {
         textAlign: "center",
-        marginTop: 20,
+        marginTop: SPACING.md,
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary
+    },
+
+    linkHighlight: {
         color: COLORS.primary,
-        fontWeight: "bold"
+        fontWeight: FONT_WEIGHT.bold
     }
 });
