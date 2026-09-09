@@ -1,16 +1,24 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import PetCard from "../components/PetCard";
-import CustomButton from "../components/CustomButton";
+import EmptyState from "../components/EmptyState";
 import { COLORS } from "../constants/colors";
+import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
+import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 import { useAuth } from "../contexts/AuthContext";
 import { usePets, useDeletePet } from "../hooks/usePets";
 
+function capitalize(value: string): string {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 export default function Home() {
 
-    const { signOut } = useAuth();
+    const { user, signOut } = useAuth();
     const { data: pets = [], isPending, isError } = usePets();
     const deletePet = useDeletePet();
+
+    const greetingName = capitalize(user?.email?.split("@")[0] ?? "tutor");
 
     async function handleLogout() {
         try {
@@ -58,22 +66,29 @@ export default function Home() {
         <ScrollView contentContainerStyle={styles.container}>
 
             <View style={styles.header}>
-                <Text style={styles.title}>
-                    Dashboard
-                </Text>
+                <View>
+                    <Text style={styles.greeting}>
+                        Olá, {greetingName} 👋
+                    </Text>
+
+                    <Text style={styles.subtitle}>
+                        Gerencie informações dos seus pets
+                    </Text>
+                </View>
 
                 <TouchableOpacity
                     style={styles.logoutButton}
                     onPress={handleLogout}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                    <Text style={styles.logoutText}>
-                        Sair
+                    <Text style={styles.logoutIcon}>
+                        🚪
                     </Text>
                 </TouchableOpacity>
             </View>
 
-            <Text style={styles.subtitle}>
-                Gerencie informações dos seus pets
+            <Text style={styles.sectionTitle}>
+                Meus Pets
             </Text>
 
             {isPending ? (
@@ -86,11 +101,11 @@ export default function Home() {
 
             ) : isError ? (
 
-                <View style={styles.emptyCard}>
-                    <Text style={styles.emptyText}>
-                        Não foi possível carregar seus pets. Tente novamente.
-                    </Text>
-                </View>
+                <EmptyState
+                    icon="⚠️"
+                    title="Não foi possível carregar seus pets"
+                    description="Verifique sua conexão e tente novamente."
+                />
 
             ) : pets.length > 0 ? (
 
@@ -110,31 +125,79 @@ export default function Home() {
 
             ) : (
 
-                <View style={styles.emptyCard}>
-                    <Text style={styles.emptyText}>
-                        Nenhum pet cadastrado
-                    </Text>
-                </View>
+                <EmptyState
+                    icon="🐾"
+                    title="Nenhum pet cadastrado"
+                    description="Cadastre seu primeiro pet para começar a acompanhar a saúde dele."
+                    actionLabel="Cadastrar Pet"
+                    onAction={() => router.push("/addPet")}
+                />
 
             )}
 
-            <CustomButton
-                title="Cadastrar Pet"
-                backgroundColor="#4CAF50"
+            <Text style={styles.sectionTitle}>
+                Ações rápidas
+            </Text>
+
+            <TouchableOpacity
+                style={styles.navCard}
+                activeOpacity={0.8}
                 onPress={() => router.push("/addPet")}
-            />
+            >
+                <View style={[styles.navIconWrapper, { backgroundColor: COLORS.successMuted }]}>
+                    <Text style={styles.navIcon}>
+                        🐾
+                    </Text>
+                </View>
 
-            <CustomButton
-                title="Histórico Clínico"
-                backgroundColor="#FF9800"
+                <Text style={styles.navLabel}>
+                    Cadastrar Pet
+                </Text>
+
+                <Text style={styles.navChevron}>
+                    ›
+                </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.navCard}
+                activeOpacity={0.8}
                 onPress={() => router.push("/history")}
-            />
+            >
+                <View style={[styles.navIconWrapper, { backgroundColor: COLORS.warningMuted }]}>
+                    <Text style={styles.navIcon}>
+                        📋
+                    </Text>
+                </View>
 
-            <CustomButton
-                title="Chat IA"
-                backgroundColor="#9C27B0"
+                <Text style={styles.navLabel}>
+                    Histórico Clínico
+                </Text>
+
+                <Text style={styles.navChevron}>
+                    ›
+                </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.navCard}
+                activeOpacity={0.8}
                 onPress={() => router.push("/chat")}
-            />
+            >
+                <View style={[styles.navIconWrapper, { backgroundColor: COLORS.primaryMuted }]}>
+                    <Text style={styles.navIcon}>
+                        💬
+                    </Text>
+                </View>
+
+                <Text style={styles.navLabel}>
+                    Chat IA
+                </Text>
+
+                <Text style={styles.navChevron}>
+                    ›
+                </Text>
+            </TouchableOpacity>
 
         </ScrollView>
     );
@@ -142,7 +205,7 @@ export default function Home() {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
+        padding: SPACING.lg,
         backgroundColor: COLORS.background,
         flexGrow: 1
     },
@@ -150,48 +213,81 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "center",
-        marginTop: 20
+        alignItems: "flex-start",
+        marginTop: SPACING.lg,
+        marginBottom: SPACING.lg
     },
 
-    title: {
-        fontSize: 30,
-        fontWeight: "bold",
+    greeting: {
+        fontSize: TYPOGRAPHY.title.fontSize,
+        fontWeight: TYPOGRAPHY.title.fontWeight,
         color: COLORS.text
     },
 
-    logoutButton: {
-        backgroundColor: COLORS.card,
-        paddingVertical: 8,
-        paddingHorizontal: 14,
-        borderRadius: 12
-    },
-
-    logoutText: {
-        color: COLORS.danger,
-        fontWeight: "bold"
-    },
-
     subtitle: {
-        fontSize: 15,
-        color: COLORS.gray,
-        marginTop: 15,
-        marginBottom: 20
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary,
+        marginTop: 2
+    },
+
+    logoutButton: {
+        width: 44,
+        height: 44,
+        borderRadius: RADIUS.full,
+        backgroundColor: COLORS.card,
+        alignItems: "center",
+        justifyContent: "center",
+        ...SHADOWS.subtle
+    },
+
+    logoutIcon: {
+        fontSize: 20
+    },
+
+    sectionTitle: {
+        fontSize: FONT_SIZE.subtitle,
+        fontWeight: FONT_WEIGHT.bold,
+        color: COLORS.text,
+        marginTop: SPACING.lg,
+        marginBottom: SPACING.sm
     },
 
     loading: {
-        marginVertical: 30
+        marginVertical: SPACING.xl
     },
 
-    emptyCard: {
+    navCard: {
+        flexDirection: "row",
+        alignItems: "center",
         backgroundColor: COLORS.card,
-        padding: 20,
-        borderRadius: 15,
-        marginVertical: 20
+        padding: SPACING.md,
+        borderRadius: RADIUS.lg,
+        marginBottom: SPACING.sm,
+        ...SHADOWS.subtle
     },
 
-    emptyText: {
-        textAlign: "center",
-        color: COLORS.gray
+    navIconWrapper: {
+        width: 40,
+        height: 40,
+        borderRadius: RADIUS.full,
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: SPACING.md
+    },
+
+    navIcon: {
+        fontSize: 18
+    },
+
+    navLabel: {
+        flex: 1,
+        fontSize: FONT_SIZE.body,
+        fontWeight: FONT_WEIGHT.semibold,
+        color: COLORS.text
+    },
+
+    navChevron: {
+        fontSize: FONT_SIZE.title,
+        color: COLORS.textSecondary
     }
 });
