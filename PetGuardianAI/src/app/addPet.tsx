@@ -1,12 +1,14 @@
 import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
-import { savePet } from "../storage/storage";
+import { useAddPet } from "../hooks/usePets";
 import CustomButton from "../components/CustomButton";
 import BackButton from "../components/BackButton";
 import { COLORS } from "../constants/colors";
 
 export default function AddPet() {
+
+    const addPet = useAddPet();
 
     const [name, setName] = useState("");
     const [species, setSpecies] = useState("");
@@ -24,23 +26,30 @@ export default function AddPet() {
             return;
         }
 
-        const success = await savePet({
-            name,
-            species,
-            age
-        });
-
-        if (success) {
+        try {
+            await addPet.mutateAsync({
+                name: name.trim(),
+                species: species.trim(),
+                age: Number(age)
+            });
 
             Alert.alert(
                 "Sucesso",
                 "Pet cadastrado com sucesso"
             );
+
             setName("");
             setSpecies("");
             setAge("");
 
             router.back();
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível cadastrar o pet. Tente novamente.";
+
+            Alert.alert("Erro", message);
         }
     }
 
@@ -56,6 +65,7 @@ export default function AddPet() {
                 placeholder="Nome do pet"
                 value={name}
                 onChangeText={setName}
+                editable={!addPet.isPending}
             />
 
             <TextInput
@@ -63,6 +73,7 @@ export default function AddPet() {
                 placeholder="Espécie"
                 value={species}
                 onChangeText={setSpecies}
+                editable={!addPet.isPending}
             />
 
             <TextInput
@@ -71,6 +82,7 @@ export default function AddPet() {
                 value={age}
                 onChangeText={setAge}
                 keyboardType="numeric"
+                editable={!addPet.isPending}
             />
 
             <View style={styles.previewCard}>
@@ -88,6 +100,7 @@ export default function AddPet() {
             <CustomButton
                 title="Salvar Pet"
                 onPress={handleSave}
+                loading={addPet.isPending}
             />
         </View>
     );

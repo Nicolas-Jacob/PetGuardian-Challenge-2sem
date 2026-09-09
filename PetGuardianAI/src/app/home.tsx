@@ -1,31 +1,16 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
-import { useState, useCallback } from "react";
-import { router, useFocusEffect } from "expo-router";
-import { Pet, getPets } from "../storage/storage";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { router } from "expo-router";
 import PetCard from "../components/PetCard";
 import CustomButton from "../components/CustomButton";
 import { COLORS } from "../constants/colors";
 import { useAuth } from "../contexts/AuthContext";
+import { usePets, useDeletePet } from "../hooks/usePets";
 
 export default function Home() {
 
     const { signOut } = useAuth();
-
-    const [pets, setPets] =
-        useState<Pet[]>([]);
-
-    async function loadPets() {
-        const data =
-            await getPets();
-
-        setPets(data);
-    }
-
-    useFocusEffect(
-        useCallback(() => {
-            loadPets();
-        }, [])
-    );
+    const { data: pets = [], isPending, isError } = usePets();
+    const deletePet = useDeletePet();
 
     async function handleLogout() {
         try {
@@ -38,6 +23,35 @@ export default function Home() {
 
             Alert.alert("Erro", message);
         }
+    }
+
+    function confirmDelete(petId: string, petName: string) {
+        Alert.alert(
+            "Excluir pet",
+            `Tem certeza que deseja excluir ${petName}?`,
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel"
+                },
+                {
+                    text: "Excluir",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await deletePet.mutateAsync(petId);
+                        } catch (error) {
+                            const message =
+                                error instanceof Error
+                                    ? error.message
+                                    : "Não foi possível excluir o pet.";
+
+                            Alert.alert("Erro", message);
+                        }
+                    }
+                }
+            ]
+        );
     }
 
     return (
@@ -62,12 +76,35 @@ export default function Home() {
                 Gerencie informações dos seus pets
             </Text>
 
-            {pets.length > 0 ? (
+            {isPending ? (
 
-                pets.map((pet, index) => (
+                <ActivityIndicator
+                    size="large"
+                    color={COLORS.primary}
+                    style={styles.loading}
+                />
+
+            ) : isError ? (
+
+                <View style={styles.emptyCard}>
+                    <Text style={styles.emptyText}>
+                        Não foi possível carregar seus pets. Tente novamente.
+                    </Text>
+                </View>
+
+            ) : pets.length > 0 ? (
+
+                pets.map((pet) => (
                     <PetCard
-                        key={index}
+                        key={pet.id}
                         pet={pet}
+                        onPress={() =>
+                            router.push({
+                                pathname: "/editPet/[id]",
+                                params: { id: pet.id }
+                            })
+                        }
+                        onDelete={() => confirmDelete(pet.id, pet.name)}
                     />
                 ))
 
@@ -140,6 +177,10 @@ const styles = StyleSheet.create({
         color: COLORS.gray,
         marginTop: 15,
         marginBottom: 20
+    },
+
+    loading: {
+        marginVertical: 30
     },
 
     emptyCard: {

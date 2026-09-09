@@ -1,20 +1,42 @@
-import { View, Text, StyleSheet } from "react-native";
-import { Pet } from "../storage/storage";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Pet } from "../types";
 import { COLORS } from "../constants/colors";
 
 interface Props {
     pet: Pet;
+    onPress?: () => void;
+    onDelete?: () => void;
 }
 
 export default function PetCard({
-    pet
+    pet,
+    onPress,
+    onDelete
 }: Props) {
     return (
-        <View style={styles.card}>
+        <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={onPress}
+            disabled={!onPress}
+        >
+            <View style={styles.header}>
+                <Text style={styles.title}>
+                    🐾 {pet.name}
+                </Text>
 
-            <Text style={styles.title}>
-                🐾 {pet.name}
-            </Text>
+                {onDelete && (
+                    <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={onDelete}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <Text style={styles.deleteText}>
+                            🗑️
+                        </Text>
+                    </TouchableOpacity>
+                )}
+            </View>
 
             <View style={styles.infoContainer}>
                 <Text style={styles.label}>
@@ -35,7 +57,7 @@ export default function PetCard({
                     {pet.age} anos
                 </Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 }
 
@@ -58,11 +80,25 @@ const styles = StyleSheet.create({
         elevation: 6
     },
 
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 15
+    },
+
     title: {
         fontSize: 22,
         fontWeight: "bold",
-        marginBottom: 15,
         color: COLORS.text
+    },
+
+    deleteButton: {
+        padding: 4
+    },
+
+    deleteText: {
+        fontSize: 18
     },
 
     infoContainer: {
