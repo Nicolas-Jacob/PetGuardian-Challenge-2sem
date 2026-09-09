@@ -1,12 +1,15 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { useState, useCallback } from "react";
 import { router, useFocusEffect } from "expo-router";
 import { Pet, getPets } from "../storage/storage";
 import PetCard from "../components/PetCard";
 import CustomButton from "../components/CustomButton";
 import { COLORS } from "../constants/colors";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Home() {
+
+    const { signOut } = useAuth();
 
     const [pets, setPets] =
         useState<Pet[]>([]);
@@ -24,12 +27,36 @@ export default function Home() {
         }, [])
     );
 
+    async function handleLogout() {
+        try {
+            await signOut();
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível sair. Tente novamente.";
+
+            Alert.alert("Erro", message);
+        }
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
 
-            <Text style={styles.title}>
-                Dashboard
-            </Text>
+            <View style={styles.header}>
+                <Text style={styles.title}>
+                    Dashboard
+                </Text>
+
+                <TouchableOpacity
+                    style={styles.logoutButton}
+                    onPress={handleLogout}
+                >
+                    <Text style={styles.logoutText}>
+                        Sair
+                    </Text>
+                </TouchableOpacity>
+            </View>
 
             <Text style={styles.subtitle}>
                 Gerencie informações dos seus pets
@@ -83,16 +110,35 @@ const styles = StyleSheet.create({
         flexGrow: 1
     },
 
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginTop: 20
+    },
+
     title: {
         fontSize: 30,
         fontWeight: "bold",
-        marginTop: 20,
         color: COLORS.text
+    },
+
+    logoutButton: {
+        backgroundColor: COLORS.card,
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 12
+    },
+
+    logoutText: {
+        color: COLORS.danger,
+        fontWeight: "bold"
     },
 
     subtitle: {
         fontSize: 15,
         color: COLORS.gray,
+        marginTop: 15,
         marginBottom: 20
     },
 
