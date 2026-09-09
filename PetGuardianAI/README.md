@@ -1,102 +1,69 @@
 # Vídeo YouTube
 
-https://www.youtube.com/watch?v=vu3WBKNJnTE
+[LINK DO VIDEO SERA COLOCADO FUTURAMENTE]
 
 # 🐾 PetGuardian AI
 
-Aplicativo mobile desenvolvido em React Native com Expo para acompanhamento preventivo de pets, permitindo cadastro, histórico clínico e interação com um chat inteligente.
+Aplicativo mobile desenvolvido em React Native com Expo para acompanhamento preventivo de pets, com autenticação real, cadastro e histórico clínico sincronizados na nuvem via Firebase.
 
 ---
 
 # 📖 Descrição do Projeto
 
-O PetGuardian AI foi desenvolvido com o objetivo de auxiliar tutores no acompanhamento preventivo da saúde de seus animais de estimação.
+O PetGuardian AI foi desenvolvido para ajudar tutores a organizar o acompanhamento preventivo da saúde de seus animais de estimação.
 
-O aplicativo oferece uma experiência simples e intuitiva, permitindo registrar informações dos pets, consultar históricos clínicos e utilizar um chat inteligente que fornece recomendações preventivas.
+Cada tutor possui sua própria conta, com dados isolados dos demais usuários. Através do app é possível cadastrar pets, registrar e consultar o histórico clínico de cada um (vacinas, consultas, exames) e tirar dúvidas rápidas sobre cuidados básicos em um chat de orientação.
 
-O sistema foi criado visando melhorar a organização dos cuidados dos animais e facilitar o acesso rápido às informações.
+Todos os dados de pets e histórico clínico são armazenados no Firebase Firestore, sincronizados em tempo real entre sessões, e vinculados à conta autenticada do tutor.
 
 ---
 
 # 🚀 Funcionalidades do Sistema
 
-O aplicativo possui as seguintes funcionalidades:
+### 🔐 Autenticação
 
-### 🏠 Tela Inicial
+- Cadastro de conta com e-mail e senha ([register.tsx](src/app/register.tsx))
+- Login com e-mail e senha ([login.tsx](src/app/login.tsx))
+- Sessão persistida entre reaberturas do app (Firebase Auth + AsyncStorage como camada de persistência)
+- Logout ([home.tsx](src/app/home.tsx))
+- Proteção de rotas: usuários não autenticados são redirecionados automaticamente para o login, e usuários autenticados não acessam as telas de login/cadastro ([_layout.tsx](src/app/_layout.tsx))
+- Mensagens de erro do Firebase traduzidas para português ([AuthContext.tsx](src/contexts/AuthContext.tsx))
 
-- Entrada do aplicativo
-- Acesso às funcionalidades do sistema
+### 🐾 Cadastro e Gestão de Pets
 
-### 🐾 Cadastro de Pet
-
-Permite cadastrar:
-
-- Nome
-- Espécie
-- Idade
-
-Possui:
-
-- Validação dos campos
-- Verificação de dados inválidos
-- Preview em tempo real
-- Cadastro de múltiplos pets
-
-### 📋 Dashboard
-
-Permite:
-
-- Visualizar informações dos pets cadastrados
-- Navegar entre funcionalidades
-- Exibir múltiplos pets
+- Cadastrar um novo pet, com validação dos campos ([addPet.tsx](src/app/addPet.tsx))
+- Listar todos os pets do tutor autenticado ([home.tsx](src/app/home.tsx))
+- Editar os dados de um pet existente ([editPet/[id].tsx](src/app/editPet/%5Bid%5D.tsx))
+- Excluir um pet, com confirmação ([home.tsx](src/app/home.tsx))
+- Dados sincronizados com o Firestore (coleção `users/{uid}/pets`), com atualização automática da lista após qualquer alteração
 
 ### 🏥 Histórico Clínico
 
-Permite:
+- Selecionar um pet para ver seu histórico ([history/index.tsx](src/app/history/index.tsx))
+- Listar os registros clínicos daquele pet ([history/[petId]/index.tsx](src/app/history/%5BpetId%5D/index.tsx))
+- Criar um novo registro (vacina, consulta, exame) ([history/[petId]/create.tsx](src/app/history/%5BpetId%5D/create.tsx))
+- Editar um registro existente ([history/[petId]/edit/[recordId].tsx](src/app/history/%5BpetId%5D/edit/%5BrecordId%5D.tsx))
+- Excluir um registro, com confirmação
+- Cada registro fica vinculado ao pet pelo seu ID (coleção `users/{uid}/history`), não mais pelo nome do pet
 
-- Criar novas ações clínicas
-- Selecionar um pet específico
-- Registrar vacinas
-- Registrar consultas
-- Registrar exames
-- Visualizar histórico individual de cada pet
+### 💬 Chat
 
-### 🤖 Chat IA Simulado
+Tela de chat com respostas automáticas sobre cuidados básicos ([chat.tsx](src/app/chat.tsx)).
 
-Possui respostas automáticas sobre:
-
-- Vacinação
-- Alimentação
-- Hidratação
-- Banhos
-- Consultas veterinárias
-- Vômitos
-- Cansaço
-- Falta de apetite
-- Perguntas frequentes
-
-### 💾 Persistência Local
-
-Utilizando AsyncStorage:
-
-- Salvar múltiplos pets
-- Recuperar pets cadastrados
-- Salvar históricos clínicos
-- Restaurar dados após reiniciar o aplicativo
+**Importante:** hoje esse chat funciona por correspondência de palavras-chave em um conjunto fixo de perguntas frequentes (vacinação, alimentação, hidratação, apetite, vômito, consultas, banho, cansaço) — **não é uma IA/LLM real**, é um mecanismo de regras que devolve uma resposta pré-escrita quando reconhece um termo na pergunta. Perguntas fora desse conjunto recebem uma resposta genérica sugerindo acompanhamento veterinário.
 
 ---
 
 # 🛠 Tecnologias Utilizadas
 
-Tecnologias usadas no desenvolvimento:
-
-- React Native
-- Expo
-- TypeScript
-- Expo Router
-- AsyncStorage
-- React Hooks
-- StyleSheet
+- [React Native](https://reactnative.dev/) `0.86`
+- [Expo](https://expo.dev/) SDK `57`
+- [TypeScript](https://www.typescriptlang.org/) `6.0`
+- [Expo Router](https://docs.expo.dev/router/introduction/) (rotas tipadas, incluindo rotas dinâmicas aninhadas)
+- [Firebase](https://firebase.google.com/) — Authentication (e-mail/senha) e Firestore (banco de dados)
+- [TanStack Query](https://tanstack.com/query/latest) (`@tanstack/react-query`) — cache, sincronização e mutações contra o Firestore
+- [@react-native-async-storage/async-storage](https://github.com/react-native-async-storage/async-storage) — persistência local da sessão do Firebase Auth
+- [ESLint](https://eslint.org/) (`eslint-config-expo`)
 
 ---
 
@@ -111,20 +78,49 @@ PetGuardianAI/
 │   │   ├── _layout.tsx
 │   │   ├── index.tsx
 │   │   ├── login.tsx
+│   │   ├── register.tsx
 │   │   ├── home.tsx
 │   │   ├── addPet.tsx
-│   │   ├── history.tsx
+│   │   ├── editPet/
+│   │   │   └── [id].tsx
+│   │   ├── history/
+│   │   │   ├── index.tsx
+│   │   │   └── [petId]/
+│   │   │       ├── index.tsx
+│   │   │       ├── create.tsx
+│   │   │       └── edit/
+│   │   │           └── [recordId].tsx
 │   │   └── chat.tsx
 │   │
 │   ├── components/
+│   │   ├── BackButton.tsx
 │   │   ├── CustomButton.tsx
+│   │   ├── EmptyState.tsx
+│   │   ├── HistoryRecordCard.tsx
 │   │   └── PetCard.tsx
 │   │
 │   ├── constants/
-│   │   └── colors.ts
+│   │   ├── colors.ts
+│   │   ├── spacing.ts
+│   │   └── typography.ts
 │   │
-│   └── storage/
-│       └── storage.ts
+│   ├── contexts/
+│   │   └── AuthContext.tsx
+│   │
+│   ├── hooks/
+│   │   ├── createResourceHooks.ts
+│   │   ├── usePets.ts
+│   │   └── useHistory.ts
+│   │
+│   ├── services/
+│   │   ├── firebaseConfig.ts
+│   │   ├── firestoreCrud.ts
+│   │   ├── petsService.ts
+│   │   └── historyService.ts
+│   │
+│   └── types/
+│       ├── index.ts
+│       └── firebase-auth.d.ts
 │
 ├── package.json
 ├── tsconfig.json
@@ -140,9 +136,7 @@ Antes de iniciar, é necessário possuir instalado:
 
 ### Node.js
 
-Download:
-
-:contentReference[oaicite:0]{index=0}
+Download: [nodejs.org](https://nodejs.org/)
 
 Verificar instalação:
 
@@ -155,15 +149,11 @@ npm -v
 
 ### Expo Go
 
-Instalar no celular o aplicativo Expo Go.
+Instale no celular a versão mais recente do aplicativo **Expo Go** — este projeto usa o **Expo SDK 57**, então o Expo Go instalado precisa suportar essa versão do SDK (versões desatualizadas do Expo Go não conseguem abrir o projeto).
 
-Android:
+Android: [Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
 
-:contentReference[oaicite:1]{index=1}
-
-iOS:
-
-:contentReference[oaicite:2]{index=2}
+iOS: [App Store](https://apps.apple.com/app/expo-go/id982107779)
 
 ---
 
@@ -209,14 +199,17 @@ npx expo start -c
 
 ---
 
+> **Nota:** o projeto já vem com um projeto Firebase configurado em [src/services/firebaseConfig.ts](src/services/firebaseConfig.ts) (Authentication + Firestore). Não é necessário criar um novo projeto no Firebase para rodar a aplicação — basta seguir os passos acima.
+
+---
+
 # 👨‍💻 Integrantes
 
 ### Nícolas de Oliveira Jacob
 RM: 564205
 Turma: 2TDPX
 
-
-### João Victor Vendramente
+### João Victor Vendramento
 RM: 563665
 Turma: 2TDSPV
 
