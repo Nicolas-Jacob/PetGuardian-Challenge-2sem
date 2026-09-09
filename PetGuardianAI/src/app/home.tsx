@@ -8,17 +8,11 @@ import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 import { useAuth } from "../contexts/AuthContext";
 import { usePets, useDeletePet } from "../hooks/usePets";
 
-function capitalize(value: string): string {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
 export default function Home() {
 
-    const { user, signOut } = useAuth();
+    const { signOut } = useAuth();
     const { data: pets = [], isPending, isError } = usePets();
     const deletePet = useDeletePet();
-
-    const greetingName = capitalize(user?.email?.split("@")[0] ?? "tutor");
 
     async function handleLogout() {
         try {
@@ -66,9 +60,9 @@ export default function Home() {
         <ScrollView contentContainerStyle={styles.container}>
 
             <View style={styles.header}>
-                <View>
+                <View style={styles.greetingWrapper}>
                     <Text style={styles.greeting}>
-                        Olá, {greetingName} 👋
+                        Olá! 👋
                     </Text>
 
                     <Text style={styles.subtitle}>
@@ -79,10 +73,9 @@ export default function Home() {
                 <TouchableOpacity
                     style={styles.logoutButton}
                     onPress={handleLogout}
-                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                    <Text style={styles.logoutIcon}>
-                        🚪
+                    <Text style={styles.logoutText}>
+                        Sair
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -218,6 +211,11 @@ const styles = StyleSheet.create({
         marginBottom: SPACING.lg
     },
 
+    greetingWrapper: {
+        flex: 1,
+        marginRight: SPACING.md
+    },
+
     greeting: {
         fontSize: TYPOGRAPHY.title.fontSize,
         fontWeight: TYPOGRAPHY.title.fontWeight,
@@ -231,17 +229,15 @@ const styles = StyleSheet.create({
     },
 
     logoutButton: {
-        width: 44,
-        height: 44,
-        borderRadius: RADIUS.full,
         backgroundColor: COLORS.card,
-        alignItems: "center",
-        justifyContent: "center",
-        ...SHADOWS.subtle
+        paddingVertical: SPACING.sm,
+        paddingHorizontal: SPACING.md,
+        borderRadius: RADIUS.md
     },
 
-    logoutIcon: {
-        fontSize: 20
+    logoutText: {
+        color: COLORS.danger,
+        fontWeight: FONT_WEIGHT.bold
     },
 
     sectionTitle: {
