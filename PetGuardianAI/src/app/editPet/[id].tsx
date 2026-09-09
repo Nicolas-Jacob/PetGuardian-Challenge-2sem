@@ -5,6 +5,10 @@ import { usePets, useUpdatePet } from "../../hooks/usePets";
 import CustomButton from "../../components/CustomButton";
 import BackButton from "../../components/BackButton";
 import { COLORS } from "../../constants/colors";
+import { SPACING, RADIUS } from "../../constants/spacing";
+import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../../constants/typography";
+
+type FocusableField = "name" | "species" | "age";
 
 export default function EditPet() {
 
@@ -17,6 +21,7 @@ export default function EditPet() {
     const [name, setName] = useState("");
     const [species, setSpecies] = useState("");
     const [age, setAge] = useState("");
+    const [focusedField, setFocusedField] = useState<FocusableField | null>(null);
 
     useEffect(() => {
         if (pet) {
@@ -88,44 +93,96 @@ export default function EditPet() {
     return (
         <View style={styles.container}>
             <BackButton />
+
             <Text style={styles.title}>
                 Editar Pet
             </Text>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Nome do pet"
-                value={name}
-                onChangeText={setName}
-                editable={!updatePet.isPending}
-            />
+            <Text style={styles.subtitle}>
+                Atualize os dados de {pet.name}
+            </Text>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Espécie"
-                value={species}
-                onChangeText={setSpecies}
-                editable={!updatePet.isPending}
-            />
+            <View style={styles.form}>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Idade"
-                value={age}
-                onChangeText={setAge}
-                keyboardType="numeric"
-                editable={!updatePet.isPending}
-            />
+                <Text style={styles.label}>
+                    Nome
+                </Text>
+
+                <TextInput
+                    style={[
+                        styles.input,
+                        focusedField === "name" && styles.inputFocused
+                    ]}
+                    placeholder="Ex: Rex"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={name}
+                    onChangeText={setName}
+                    onFocus={() => setFocusedField("name")}
+                    onBlur={() => setFocusedField(null)}
+                    editable={!updatePet.isPending}
+                />
+
+                <Text style={styles.label}>
+                    Espécie
+                </Text>
+
+                <TextInput
+                    style={[
+                        styles.input,
+                        focusedField === "species" && styles.inputFocused
+                    ]}
+                    placeholder="Ex: Cachorro"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={species}
+                    onChangeText={setSpecies}
+                    onFocus={() => setFocusedField("species")}
+                    onBlur={() => setFocusedField(null)}
+                    editable={!updatePet.isPending}
+                />
+
+                <Text style={styles.label}>
+                    Idade
+                </Text>
+
+                <TextInput
+                    style={[
+                        styles.input,
+                        focusedField === "age" && styles.inputFocused
+                    ]}
+                    placeholder="Ex: 3"
+                    placeholderTextColor={COLORS.textSecondary}
+                    value={age}
+                    onChangeText={setAge}
+                    onFocus={() => setFocusedField("age")}
+                    onBlur={() => setFocusedField(null)}
+                    keyboardType="numeric"
+                    editable={!updatePet.isPending}
+                />
+
+            </View>
 
             <View style={styles.previewCard}>
 
                 <Text style={styles.previewTitle}>
-                    Preview
+                    Pré-visualização
                 </Text>
 
-                <Text>Nome: {name || "-"}</Text>
-                <Text>Espécie: {species || "-"}</Text>
-                <Text>Idade: {age || "-"}</Text>
+                <View style={styles.previewRow}>
+                    <Text style={styles.previewLabel}>Nome</Text>
+                    <Text style={styles.previewValue}>{name || "—"}</Text>
+                </View>
+
+                <View style={styles.previewRow}>
+                    <Text style={styles.previewLabel}>Espécie</Text>
+                    <Text style={styles.previewValue}>{species || "—"}</Text>
+                </View>
+
+                <View style={styles.previewRow}>
+                    <Text style={styles.previewLabel}>Idade</Text>
+                    <Text style={styles.previewValue}>
+                        {age ? `${age} ${age === "1" ? "ano" : "anos"}` : "—"}
+                    </Text>
+                </View>
 
             </View>
 
@@ -141,7 +198,7 @@ export default function EditPet() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        padding: SPACING.lg,
         backgroundColor: COLORS.background
     },
 
@@ -153,27 +210,75 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        fontSize: 28,
-        fontWeight: "bold",
-        marginBottom: 25
+        fontSize: TYPOGRAPHY.title.fontSize,
+        fontWeight: TYPOGRAPHY.title.fontWeight,
+        color: COLORS.text,
+        marginBottom: SPACING.xs
+    },
+
+    subtitle: {
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary,
+        marginBottom: SPACING.lg
+    },
+
+    form: {
+        marginBottom: SPACING.xs
+    },
+
+    label: {
+        fontSize: FONT_SIZE.caption,
+        fontWeight: FONT_WEIGHT.semibold,
+        color: COLORS.textSecondary,
+        marginBottom: SPACING.xs,
+        marginLeft: SPACING.xs
     },
 
     input: {
-        backgroundColor: COLORS.white,
-        padding: 15,
-        borderRadius: 12,
-        marginBottom: 15
+        backgroundColor: COLORS.card,
+        borderWidth: 1.5,
+        borderColor: COLORS.border,
+        padding: SPACING.md,
+        borderRadius: RADIUS.md,
+        marginBottom: SPACING.md,
+        fontSize: FONT_SIZE.body,
+        color: COLORS.text
+    },
+
+    inputFocused: {
+        borderColor: COLORS.primary,
+        backgroundColor: COLORS.primaryMuted
     },
 
     previewCard: {
         backgroundColor: COLORS.card,
-        padding: 20,
-        borderRadius: 15,
-        marginVertical: 20
+        padding: SPACING.lg,
+        borderRadius: RADIUS.lg,
+        marginVertical: SPACING.lg
     },
 
     previewTitle: {
-        fontWeight: "bold",
-        marginBottom: 10
+        fontSize: FONT_SIZE.caption,
+        fontWeight: FONT_WEIGHT.bold,
+        color: COLORS.textSecondary,
+        marginBottom: SPACING.sm,
+        textTransform: "uppercase"
+    },
+
+    previewRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingVertical: SPACING.xs
+    },
+
+    previewLabel: {
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary
+    },
+
+    previewValue: {
+        fontSize: FONT_SIZE.body,
+        fontWeight: FONT_WEIGHT.semibold,
+        color: COLORS.text
     }
 });
