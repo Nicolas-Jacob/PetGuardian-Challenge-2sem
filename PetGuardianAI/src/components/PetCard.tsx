@@ -1,11 +1,28 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Pet } from "../types";
 import { COLORS } from "../constants/colors";
+import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
+import { FONT_SIZE, FONT_WEIGHT } from "../constants/typography";
 
 interface Props {
     pet: Pet;
     onPress?: () => void;
     onDelete?: () => void;
+}
+
+function getSpeciesEmoji(species: string): string {
+    const normalized = species.trim().toLowerCase();
+
+    if (normalized.includes("cachorro") || normalized.includes("cão") || normalized.includes("cao") || normalized.includes("dog")) return "🐶";
+    if (normalized.includes("gato") || normalized.includes("cat")) return "🐱";
+    if (normalized.includes("pássaro") || normalized.includes("passaro") || normalized.includes("ave") || normalized.includes("bird")) return "🐦";
+    if (normalized.includes("peixe") || normalized.includes("fish")) return "🐠";
+    if (normalized.includes("coelho") || normalized.includes("rabbit")) return "🐰";
+    if (normalized.includes("hamster")) return "🐹";
+    if (normalized.includes("tartaruga") || normalized.includes("turtle")) return "🐢";
+    if (normalized.includes("réptil") || normalized.includes("reptil") || normalized.includes("lagarto")) return "🦎";
+
+    return "🐾";
 }
 
 export default function PetCard({
@@ -21,9 +38,21 @@ export default function PetCard({
             disabled={!onPress}
         >
             <View style={styles.header}>
-                <Text style={styles.title}>
-                    🐾 {pet.name}
-                </Text>
+                <View style={styles.iconWrapper}>
+                    <Text style={styles.icon}>
+                        {getSpeciesEmoji(pet.species)}
+                    </Text>
+                </View>
+
+                <View style={styles.identity}>
+                    <Text style={styles.name} numberOfLines={1}>
+                        {pet.name}
+                    </Text>
+
+                    <Text style={styles.species} numberOfLines={1}>
+                        {pet.species}
+                    </Text>
+                </View>
 
                 {onDelete && (
                     <TouchableOpacity
@@ -38,24 +67,12 @@ export default function PetCard({
                 )}
             </View>
 
-            <View style={styles.infoContainer}>
-                <Text style={styles.label}>
-                    Espécie:
-                </Text>
-
-                <Text style={styles.value}>
-                    {pet.species}
-                </Text>
-            </View>
-
-            <View style={styles.infoContainer}>
-                <Text style={styles.label}>
-                    Idade:
-                </Text>
-
-                <Text style={styles.value}>
-                    {pet.age} anos
-                </Text>
+            <View style={styles.footer}>
+                <View style={styles.ageBadge}>
+                    <Text style={styles.ageBadgeText}>
+                        {pet.age} {pet.age === 1 ? "ano" : "anos"}
+                    </Text>
+                </View>
             </View>
         </TouchableOpacity>
     );
@@ -65,53 +82,70 @@ const styles = StyleSheet.create({
 
     card: {
         backgroundColor: COLORS.card,
-        padding: 20,
-        borderRadius: 20,
-        marginVertical: 20,
-
-        shadowColor: COLORS.shadow,
-        shadowOffset: {
-            width: 0,
-            height: 5
-        },
-
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 6
+        padding: SPACING.lg,
+        borderRadius: RADIUS.xl,
+        marginVertical: SPACING.sm,
+        ...SHADOWS.card
     },
 
     header: {
         flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 15
+        alignItems: "center"
     },
 
-    title: {
-        fontSize: 22,
-        fontWeight: "bold",
+    iconWrapper: {
+        width: 48,
+        height: 48,
+        borderRadius: RADIUS.full,
+        backgroundColor: COLORS.primaryMuted,
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: SPACING.md
+    },
+
+    icon: {
+        fontSize: 24
+    },
+
+    identity: {
+        flex: 1
+    },
+
+    name: {
+        fontSize: FONT_SIZE.subtitle,
+        fontWeight: FONT_WEIGHT.bold,
         color: COLORS.text
     },
 
+    species: {
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary,
+        marginTop: 2
+    },
+
     deleteButton: {
-        padding: 4
+        padding: SPACING.xs
     },
 
     deleteText: {
         fontSize: 18
     },
 
-    infoContainer: {
+    footer: {
         flexDirection: "row",
-        marginBottom: 8
+        marginTop: SPACING.md
     },
 
-    label: {
-        fontWeight: "bold",
-        marginRight: 5
+    ageBadge: {
+        backgroundColor: COLORS.primaryMuted,
+        paddingVertical: SPACING.xs,
+        paddingHorizontal: SPACING.sm,
+        borderRadius: RADIUS.sm
     },
 
-    value: {
-        color: COLORS.gray
+    ageBadgeText: {
+        fontSize: FONT_SIZE.caption,
+        fontWeight: FONT_WEIGHT.semibold,
+        color: COLORS.primary
     }
 });
