@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
+import { useResourceMutation } from "./createResourceHooks";
 import { getPets, addPet, updatePet, deletePet } from "../services/petsService";
 import { Pet } from "../types";
 
@@ -15,51 +16,23 @@ export function usePets() {
 }
 
 export function useAddPet() {
-
-    const { user } = useAuth();
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (data: Omit<Pet, "id" | "createdAt">) =>
-            addPet(user!.uid, data),
-
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["pets", user?.uid]
-            });
-        }
-    });
+    return useResourceMutation(
+        (uid, data: Omit<Pet, "id" | "createdAt">) => addPet(uid, data),
+        (uid) => ["pets", uid]
+    );
 }
 
 export function useUpdatePet() {
-
-    const { user } = useAuth();
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: ({ petId, data }: { petId: string; data: Partial<Pet> }) =>
-            updatePet(user!.uid, petId, data),
-
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["pets", user?.uid]
-            });
-        }
-    });
+    return useResourceMutation(
+        (uid, { petId, data }: { petId: string; data: Partial<Pet> }) =>
+            updatePet(uid, petId, data),
+        (uid) => ["pets", uid]
+    );
 }
 
 export function useDeletePet() {
-
-    const { user } = useAuth();
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (petId: string) => deletePet(user!.uid, petId),
-
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["pets", user?.uid]
-            });
-        }
-    });
+    return useResourceMutation(
+        (uid, petId: string) => deletePet(uid, petId),
+        (uid) => ["pets", uid]
+    );
 }

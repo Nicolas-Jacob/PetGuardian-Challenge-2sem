@@ -1,20 +1,12 @@
-import {
-    collection,
-    doc,
-    getDocs,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    query,
-    where,
-    orderBy
-} from "firebase/firestore";
+import { getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from "./firebaseConfig";
+import { createFirestoreCrud } from "./firestoreCrud";
 import { HistoryRecord } from "../types";
 
-function historyCollection(uid: string) {
-    return collection(db, "users", uid, "history");
-}
+const historyCrud = createFirestoreCrud<HistoryRecord>(
+    db,
+    (uid) => ["users", uid, "history"]
+);
 
 export async function getHistoryByPet(
     uid: string,
@@ -22,28 +14,21 @@ export async function getHistoryByPet(
 ): Promise<HistoryRecord[]> {
 
     const historyQuery = query(
-        historyCollection(uid),
+        historyCrud.collectionRef(uid),
         where("petId", "==", petId),
         orderBy("createdAt", "desc")
     );
 
     const snapshot = await getDocs(historyQuery);
 
-    return snapshot.docs.map((docSnapshot) => ({
-        id: docSnapshot.id,
-        ...docSnapshot.data()
-    })) as HistoryRecord[];
+    return historyCrud.mapSnapshot(snapshot);
 }
 
 export async function addHistoryRecord(
     uid: string,
     data: Omit<HistoryRecord, "id" | "createdAt">
 ): Promise<void> {
-
-    await addDoc(historyCollection(uid), {
-        ...data,
-        createdAt: Date.now()
-    });
+    return historyCrud.add(uid, data);
 }
 
 export async function updateHistoryRecord(
@@ -51,19 +36,12 @@ export async function updateHistoryRecord(
     recordId: string,
     data: Partial<HistoryRecord>
 ): Promise<void> {
-
-    const { id, createdAt, ...updateData } = data;
-
-    await updateDoc(
-        doc(db, "users", uid, "history", recordId),
-        updateData
-    );
+    return historyCrud.update(uid, recordId, data);
 }
 
 export async function deleteHistoryRecord(
     uid: string,
     recordId: string
 ): Promise<void> {
-
-    await deleteDoc(doc(db, "users", uid, "history", recordId));
+    return historyCrud.remove(uid, recordId);
 }

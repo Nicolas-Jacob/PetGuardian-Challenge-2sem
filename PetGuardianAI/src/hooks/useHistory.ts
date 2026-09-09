@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
+import { useResourceMutation } from "./createResourceHooks";
 import {
     getHistoryByPet,
     addHistoryRecord,
@@ -20,62 +21,27 @@ export function useHistoryByPet(petId: string) {
 }
 
 export function useAddHistoryRecord() {
-
-    const { user } = useAuth();
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (data: Omit<HistoryRecord, "id" | "createdAt">) =>
-            addHistoryRecord(user!.uid, data),
-
-        onSuccess: (_result, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: ["history", user?.uid, variables.petId]
-            });
-        }
-    });
+    return useResourceMutation(
+        (uid, data: Omit<HistoryRecord, "id" | "createdAt">) =>
+            addHistoryRecord(uid, data),
+        (uid, data) => ["history", uid, data.petId]
+    );
 }
 
 export function useUpdateHistoryRecord() {
-
-    const { user } = useAuth();
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: ({
-            recordId,
-            data
-        }: {
-            recordId: string;
-            petId: string;
-            data: Partial<HistoryRecord>;
-        }) => updateHistoryRecord(user!.uid, recordId, data),
-
-        onSuccess: (_result, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: ["history", user?.uid, variables.petId]
-            });
-        }
-    });
+    return useResourceMutation(
+        (
+            uid,
+            { recordId, data }: { recordId: string; petId: string; data: Partial<HistoryRecord> }
+        ) => updateHistoryRecord(uid, recordId, data),
+        (uid, variables) => ["history", uid, variables.petId]
+    );
 }
 
 export function useDeleteHistoryRecord() {
-
-    const { user } = useAuth();
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: ({
-            recordId
-        }: {
-            recordId: string;
-            petId: string;
-        }) => deleteHistoryRecord(user!.uid, recordId),
-
-        onSuccess: (_result, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: ["history", user?.uid, variables.petId]
-            });
-        }
-    });
+    return useResourceMutation(
+        (uid, { recordId }: { recordId: string; petId: string }) =>
+            deleteHistoryRecord(uid, recordId),
+        (uid, variables) => ["history", uid, variables.petId]
+    );
 }
