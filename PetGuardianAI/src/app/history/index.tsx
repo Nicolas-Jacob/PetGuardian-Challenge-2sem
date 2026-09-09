@@ -1,7 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import BackButton from "../../components/BackButton";
+import EmptyState from "../../components/EmptyState";
 import { COLORS } from "../../constants/colors";
+import { SPACING, RADIUS, SHADOWS } from "../../constants/spacing";
+import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../../constants/typography";
 import { usePets } from "../../hooks/usePets";
 
 export default function HistoryPetList() {
@@ -30,18 +33,19 @@ export default function HistoryPetList() {
 
             ) : isError ? (
 
-                <View style={styles.emptyCard}>
-                    <Text style={styles.emptyText}>
-                        Não foi possível carregar seus pets. Tente novamente.
-                    </Text>
-                </View>
+                <EmptyState
+                    icon="⚠️"
+                    title="Não foi possível carregar seus pets"
+                    description="Verifique sua conexão e tente novamente."
+                />
 
             ) : pets.length > 0 ? (
 
                 pets.map((pet) => (
-                    <Pressable
+                    <TouchableOpacity
                         key={pet.id}
-                        style={styles.petSelector}
+                        style={styles.petRow}
+                        activeOpacity={0.8}
                         onPress={() =>
                             router.push({
                                 pathname: "/history/[petId]",
@@ -49,23 +53,37 @@ export default function HistoryPetList() {
                             })
                         }
                     >
-                        <Text style={styles.petName}>
-                            🐾 {pet.name}
-                        </Text>
+                        <View style={styles.iconWrapper}>
+                            <Text style={styles.icon}>
+                                🐾
+                            </Text>
+                        </View>
 
-                        <Text style={styles.petInfo}>
-                            {pet.species} • {pet.age} anos
+                        <View style={styles.info}>
+                            <Text style={styles.petName}>
+                                {pet.name}
+                            </Text>
+
+                            <Text style={styles.petInfo}>
+                                {pet.species} • {pet.age} {pet.age === 1 ? "ano" : "anos"}
+                            </Text>
+                        </View>
+
+                        <Text style={styles.chevron}>
+                            ›
                         </Text>
-                    </Pressable>
+                    </TouchableOpacity>
                 ))
 
             ) : (
 
-                <View style={styles.emptyCard}>
-                    <Text style={styles.emptyText}>
-                        Nenhum pet cadastrado. Cadastre um pet primeiro.
-                    </Text>
-                </View>
+                <EmptyState
+                    icon="🐾"
+                    title="Nenhum pet cadastrado"
+                    description="Cadastre um pet primeiro para começar a registrar o histórico clínico."
+                    actionLabel="Cadastrar Pet"
+                    onAction={() => router.push("/addPet")}
+                />
 
             )}
 
@@ -76,61 +94,69 @@ export default function HistoryPetList() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        padding: SPACING.lg,
         backgroundColor: COLORS.background
     },
 
     title: {
-        fontSize: 28,
-        fontWeight: "bold",
-        marginBottom: 10
+        fontSize: TYPOGRAPHY.title.fontSize,
+        fontWeight: TYPOGRAPHY.title.fontWeight,
+        color: COLORS.text,
+        marginBottom: SPACING.xs
     },
 
     subtitle: {
-        color: COLORS.gray,
-        marginBottom: 20
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary,
+        marginBottom: SPACING.lg
     },
 
     loading: {
-        marginVertical: 30
+        marginVertical: SPACING.xl
     },
 
-    emptyCard: {
+    petRow: {
+        flexDirection: "row",
+        alignItems: "center",
         backgroundColor: COLORS.card,
-        padding: 20,
-        borderRadius: 15,
-        marginVertical: 20
+        padding: SPACING.md,
+        borderRadius: RADIUS.lg,
+        marginBottom: SPACING.sm,
+        ...SHADOWS.subtle
     },
 
-    emptyText: {
-        textAlign: "center",
-        color: COLORS.gray
+    iconWrapper: {
+        width: 44,
+        height: 44,
+        borderRadius: RADIUS.full,
+        backgroundColor: COLORS.primaryMuted,
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: SPACING.md
     },
 
-    petSelector: {
-        backgroundColor: COLORS.card,
-        padding: 18,
-        borderRadius: 15,
-        marginBottom: 12,
+    icon: {
+        fontSize: 20
+    },
 
-        shadowColor: COLORS.shadow,
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.15,
-        shadowRadius: 4,
-        elevation: 3
+    info: {
+        flex: 1
     },
 
     petName: {
-        fontSize: 16,
-        fontWeight: "bold",
+        fontSize: FONT_SIZE.body,
+        fontWeight: FONT_WEIGHT.bold,
         color: COLORS.text
     },
 
     petInfo: {
-        marginTop: 5,
-        color: COLORS.gray
+        fontSize: FONT_SIZE.caption,
+        color: COLORS.textSecondary,
+        marginTop: 2
+    },
+
+    chevron: {
+        fontSize: FONT_SIZE.title,
+        color: COLORS.textSecondary
     }
 });

@@ -1,8 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import BackButton from "../../../components/BackButton";
 import CustomButton from "../../../components/CustomButton";
+import EmptyState from "../../../components/EmptyState";
+import HistoryRecordCard from "../../../components/HistoryRecordCard";
 import { COLORS } from "../../../constants/colors";
+import { SPACING } from "../../../constants/spacing";
+import { FONT_SIZE, TYPOGRAPHY } from "../../../constants/typography";
 import { useHistoryByPet, useDeleteHistoryRecord } from "../../../hooks/useHistory";
 
 export default function HistoryList() {
@@ -48,6 +52,10 @@ export default function HistoryList() {
                 Histórico Clínico
             </Text>
 
+            <Text style={styles.subtitle}>
+                Vacinas, consultas e exames registrados
+            </Text>
+
             {isPending ? (
 
                 <ActivityIndicator
@@ -58,60 +66,41 @@ export default function HistoryList() {
 
             ) : isError ? (
 
-                <View style={styles.emptyCard}>
-                    <Text style={styles.emptyText}>
-                        Não foi possível carregar o histórico. Tente novamente.
-                    </Text>
-                </View>
+                <EmptyState
+                    icon="⚠️"
+                    title="Não foi possível carregar o histórico"
+                    description="Verifique sua conexão e tente novamente."
+                />
 
             ) : history.length > 0 ? (
 
                 history.map((record) => (
-                    <TouchableOpacity
+                    <HistoryRecordCard
                         key={record.id}
-                        style={styles.card}
-                        activeOpacity={0.85}
+                        record={record}
                         onPress={() =>
                             router.push({
                                 pathname: "/history/[petId]/edit/[recordId]",
                                 params: { petId, recordId: record.id }
                             })
                         }
-                    >
-                        <View style={styles.cardHeader}>
-                            <Text style={styles.recordTitle}>
-                                {record.description}
-                            </Text>
-
-                            <TouchableOpacity
-                                onPress={() => confirmDelete(record.id)}
-                                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                            >
-                                <Text style={styles.deleteText}>
-                                    🗑️
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        <Text style={styles.recordDate}>
-                            {record.date}
-                        </Text>
-                    </TouchableOpacity>
+                        onDelete={() => confirmDelete(record.id)}
+                    />
                 ))
 
             ) : (
 
-                <View style={styles.emptyCard}>
-                    <Text style={styles.emptyText}>
-                        Nenhum registro encontrado
-                    </Text>
-                </View>
+                <EmptyState
+                    icon="📋"
+                    title="Nenhum registro encontrado"
+                    description='Toque em "Nova Ação Clínica" para registrar o primeiro.'
+                />
 
             )}
 
             <CustomButton
                 title="Nova Ação Clínica"
-                backgroundColor="#E91E63"
+                variant="secondary"
                 onPress={() =>
                     router.push({
                         pathname: "/history/[petId]/create",
@@ -127,57 +116,24 @@ export default function HistoryList() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        padding: SPACING.lg,
         backgroundColor: COLORS.background
     },
 
     title: {
-        fontSize: 28,
-        fontWeight: "bold",
-        marginBottom: 20
+        fontSize: TYPOGRAPHY.title.fontSize,
+        fontWeight: TYPOGRAPHY.title.fontWeight,
+        color: COLORS.text,
+        marginBottom: SPACING.xs
+    },
+
+    subtitle: {
+        fontSize: FONT_SIZE.body,
+        color: COLORS.textSecondary,
+        marginBottom: SPACING.lg
     },
 
     loading: {
-        marginVertical: 30
-    },
-
-    emptyCard: {
-        backgroundColor: COLORS.card,
-        padding: 20,
-        borderRadius: 15,
-        marginVertical: 20
-    },
-
-    emptyText: {
-        textAlign: "center",
-        color: COLORS.gray
-    },
-
-    card: {
-        backgroundColor: COLORS.card,
-        padding: 15,
-        borderRadius: 15,
-        marginBottom: 15
-    },
-
-    cardHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 5
-    },
-
-    recordTitle: {
-        fontWeight: "bold",
-        flexShrink: 1,
-        marginRight: 10
-    },
-
-    recordDate: {
-        color: COLORS.gray
-    },
-
-    deleteText: {
-        fontSize: 16
+        marginVertical: SPACING.xl
     }
 });
