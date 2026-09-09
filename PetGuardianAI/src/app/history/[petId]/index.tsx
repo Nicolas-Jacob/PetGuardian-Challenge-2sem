@@ -66,25 +66,25 @@ export default function HistoryList() {
 
             ) : history.length > 0 ? (
 
-                history.map((item) => (
+                history.map((record) => (
                     <TouchableOpacity
-                        key={item.id}
+                        key={record.id}
                         style={styles.card}
                         activeOpacity={0.85}
                         onPress={() =>
                             router.push({
                                 pathname: "/history/[petId]/edit/[recordId]",
-                                params: { petId, recordId: item.id }
+                                params: { petId, recordId: record.id }
                             })
                         }
                     >
                         <View style={styles.cardHeader}>
                             <Text style={styles.recordTitle}>
-                                {item.description}
+                                {record.description}
                             </Text>
 
                             <TouchableOpacity
-                                onPress={() => confirmDelete(item.id)}
+                                onPress={() => confirmDelete(record.id)}
                                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                             >
                                 <Text style={styles.deleteText}>
@@ -94,7 +94,7 @@ export default function HistoryList() {
                         </View>
 
                         <Text style={styles.recordDate}>
-                            {item.date}
+                            {record.date}
                         </Text>
                     </TouchableOpacity>
                 ))
