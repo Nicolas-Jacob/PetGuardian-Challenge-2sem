@@ -6,7 +6,10 @@
     "orientation": "portrait",
     "scheme": "petguardianai",
     "userInterfaceStyle": "automatic",
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      "expo-status-bar"
+    ],
     "experiments": {
       "typedRoutes": true
     }
