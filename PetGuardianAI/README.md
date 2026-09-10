@@ -203,6 +203,17 @@ npx expo start -c
 
 ---
 
+# 🛠 Solução de problemas
+
+### "You are signed in to Expo Go as X, but not signed in to Expo CLI"
+
+Esse aviso aparece quando o **Expo Go do celular está logado** numa conta Expo, mas o terminal que rodou `npx expo start` **não está logado**. Duas formas de resolver:
+
+- **Deslogar o Expo Go no celular** (Perfil → Sair) — sem estar logado, o app abre o projeto direto pela rede local, sem checar conta nenhuma.
+- Ou rodar `npx expo login` no computador entrando com a mesma conta que está logada no celular.
+
+---
+
 # 👨‍💻 Integrantes
 
 ### Nícolas de Oliveira Jacob
