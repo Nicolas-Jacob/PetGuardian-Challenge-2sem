@@ -70,7 +70,7 @@ Tela de chat com respostas automáticas sobre cuidados básicos ([chat.tsx](src/
 # 📂 Estrutura do Projeto
 
 ```bash
-PetGuardianAI/
+challenge12-guardianpet/
 │
 ├── src/
 │   │
@@ -170,7 +170,7 @@ git clone https://github.com/2TDSPX/challenge12-guardianpet.git
 ## 2 Entrar na pasta do projeto
 
 ```bash
-cd challenge12-guardianpet/PetGuardianAI
+cd challenge12-guardianpet
 ```
 
 ---
@@ -200,6 +200,17 @@ npx expo start -c
 ---
 
 > **Nota:** o projeto já vem com um projeto Firebase configurado em [src/services/firebaseConfig.ts](src/services/firebaseConfig.ts) (Authentication + Firestore). Não é necessário criar um novo projeto no Firebase para rodar a aplicação — basta seguir os passos acima.
+
+---
+
+# 🛠 Solução de problemas
+
+### "You are signed in to Expo Go as X, but not signed in to Expo CLI"
+
+Esse aviso aparece quando o **Expo Go do celular está logado** numa conta Expo, mas o terminal que rodou `npx expo start` **não está logado**. Duas formas de resolver:
+
+- **Deslogar o Expo Go no celular** (Perfil → Sair) — sem estar logado, o app abre o projeto direto pela rede local, sem checar conta nenhuma.
+- Ou rodar `npx expo login` no computador entrando com a mesma conta que está logada no celular.
 
 ---
 
