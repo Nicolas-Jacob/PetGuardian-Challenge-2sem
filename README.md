@@ -170,7 +170,7 @@ git clone https://github.com/2TDSPX/challenge12-guardianpet.git
 ## 2 Entrar na pasta do projeto
 
 ```bash
-cd challenge12-guardianpet
+cd PetGuardian-Challenge-2sem
 ```
 
 ---
