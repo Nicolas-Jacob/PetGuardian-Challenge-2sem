@@ -2,13 +2,18 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIn
 import { router } from "expo-router";
 import PetCard from "../components/PetCard";
 import EmptyState from "../components/EmptyState";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useTheme } from "../contexts/ThemeContext";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 import { useAuth } from "../contexts/AuthContext";
 import { usePets, useDeletePet } from "../hooks/usePets";
 
 export default function Home() {
+
+    const { colors, isDark, toggleTheme } = useTheme();
+    const styles = useThemedStyles(createStyles);
 
     const { signOut } = useAuth();
     const { data: pets = [], isPending, isError } = usePets();
@@ -70,14 +75,28 @@ export default function Home() {
                     </Text>
                 </View>
 
-                <TouchableOpacity
-                    style={styles.logoutButton}
-                    onPress={handleLogout}
-                >
-                    <Text style={styles.logoutText}>
-                        Sair
-                    </Text>
-                </TouchableOpacity>
+                <View style={styles.headerActions}>
+                    <TouchableOpacity
+                        style={styles.themeButton}
+                        activeOpacity={0.8}
+                        onPress={toggleTheme}
+                        accessibilityRole="button"
+                        accessibilityLabel={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
+                    >
+                        <Text style={styles.themeIcon}>
+                            {isDark ? "☀️" : "🌙"}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.logoutButton}
+                        onPress={handleLogout}
+                    >
+                        <Text style={styles.logoutText}>
+                            Sair
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <Text style={styles.sectionTitle}>
@@ -88,7 +107,7 @@ export default function Home() {
 
                 <ActivityIndicator
                     size="large"
-                    color={COLORS.primary}
+                    color={colors.primary}
                     style={styles.loading}
                 />
 
@@ -137,7 +156,7 @@ export default function Home() {
                 activeOpacity={0.8}
                 onPress={() => router.push("/addPet")}
             >
-                <View style={[styles.navIconWrapper, { backgroundColor: COLORS.successMuted }]}>
+                <View style={[styles.navIconWrapper, { backgroundColor: colors.successMuted }]}>
                     <Text style={styles.navIcon}>
                         🐾
                     </Text>
@@ -157,7 +176,7 @@ export default function Home() {
                 activeOpacity={0.8}
                 onPress={() => router.push("/history")}
             >
-                <View style={[styles.navIconWrapper, { backgroundColor: COLORS.warningMuted }]}>
+                <View style={[styles.navIconWrapper, { backgroundColor: colors.warningMuted }]}>
                     <Text style={styles.navIcon}>
                         📋
                     </Text>
@@ -177,7 +196,7 @@ export default function Home() {
                 activeOpacity={0.8}
                 onPress={() => router.push("/chat")}
             >
-                <View style={[styles.navIconWrapper, { backgroundColor: COLORS.primaryMuted }]}>
+                <View style={[styles.navIconWrapper, { backgroundColor: colors.primaryMuted }]}>
                     <Text style={styles.navIcon}>
                         💬
                     </Text>
@@ -197,7 +216,7 @@ export default function Home() {
                 activeOpacity={0.8}
                 onPress={() => router.push("/about")}
             >
-                <View style={[styles.navIconWrapper, { backgroundColor: COLORS.border }]}>
+                <View style={[styles.navIconWrapper, { backgroundColor: colors.border }]}>
                     <Text style={styles.navIcon}>
                         ℹ️
                     </Text>
@@ -216,10 +235,10 @@ export default function Home() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         padding: SPACING.lg,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
         flexGrow: 1
     },
 
@@ -239,31 +258,52 @@ const styles = StyleSheet.create({
     greeting: {
         fontSize: TYPOGRAPHY.title.fontSize,
         fontWeight: TYPOGRAPHY.title.fontWeight,
-        color: COLORS.text
+        color: colors.text
     },
 
     subtitle: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginTop: 2
     },
 
+    headerActions: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
+
+    themeButton: {
+        width: 40,
+        height: 40,
+        borderRadius: RADIUS.full,
+        backgroundColor: colors.primaryMuted,
+        borderWidth: 1.5,
+        borderColor: colors.primary,
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: SPACING.sm
+    },
+
+    themeIcon: {
+        fontSize: 18
+    },
+
     logoutButton: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         paddingVertical: SPACING.sm,
         paddingHorizontal: SPACING.md,
         borderRadius: RADIUS.md
     },
 
     logoutText: {
-        color: COLORS.danger,
+        color: colors.danger,
         fontWeight: FONT_WEIGHT.bold
     },
 
     sectionTitle: {
         fontSize: FONT_SIZE.subtitle,
         fontWeight: FONT_WEIGHT.bold,
-        color: COLORS.text,
+        color: colors.text,
         marginTop: SPACING.lg,
         marginBottom: SPACING.sm
     },
@@ -275,7 +315,7 @@ const styles = StyleSheet.create({
     navCard: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         padding: SPACING.md,
         borderRadius: RADIUS.lg,
         marginBottom: SPACING.sm,
@@ -299,11 +339,11 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: FONT_SIZE.body,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.text
+        color: colors.text
     },
 
     navChevron: {
         fontSize: FONT_SIZE.title,
-        color: COLORS.textSecondary
+        color: colors.textSecondary
     }
 });

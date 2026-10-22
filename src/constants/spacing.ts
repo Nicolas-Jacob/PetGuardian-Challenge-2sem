@@ -1,4 +1,4 @@
-import { COLORS } from "./colors";
+import { lightColors } from "./colors";
 
 export const SPACING = {
     xs: 4,
@@ -19,7 +19,7 @@ export const RADIUS = {
 
 export const SHADOWS = {
     card: {
-        shadowColor: COLORS.shadow,
+        shadowColor: lightColors.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.15,
         shadowRadius: 8,
@@ -27,7 +27,7 @@ export const SHADOWS = {
     },
 
     subtle: {
-        shadowColor: COLORS.shadow,
+        shadowColor: lightColors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,

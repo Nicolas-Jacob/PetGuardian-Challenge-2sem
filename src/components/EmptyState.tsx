@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import CustomButton from "./CustomButton";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT } from "../constants/typography";
 
@@ -19,6 +20,8 @@ export default function EmptyState({
     actionLabel,
     onAction
 }: Props) {
+    const styles = useThemedStyles(createStyles);
+
     return (
         <View style={styles.container}>
             <View style={styles.iconWrapper}>
@@ -47,10 +50,10 @@ export default function EmptyState({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         alignItems: "center",
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         padding: SPACING.xl,
         borderRadius: RADIUS.xl,
         marginVertical: SPACING.lg
@@ -60,7 +63,7 @@ const styles = StyleSheet.create({
         width: 64,
         height: 64,
         borderRadius: RADIUS.full,
-        backgroundColor: COLORS.primaryMuted,
+        backgroundColor: colors.primaryMuted,
         alignItems: "center",
         justifyContent: "center",
         marginBottom: SPACING.md
@@ -73,13 +76,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: FONT_SIZE.subtitle,
         fontWeight: FONT_WEIGHT.bold,
-        color: COLORS.text,
+        color: colors.text,
         textAlign: "center"
     },
 
     description: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         textAlign: "center",
         marginTop: SPACING.xs,
         marginBottom: SPACING.md

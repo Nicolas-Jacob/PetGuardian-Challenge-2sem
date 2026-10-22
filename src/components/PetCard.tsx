@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Pet } from "../types";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT } from "../constants/typography";
 
@@ -30,6 +31,8 @@ export default function PetCard({
     onPress,
     onDelete
 }: Props) {
+    const styles = useThemedStyles(createStyles);
+
     return (
         <TouchableOpacity
             style={styles.card}
@@ -78,10 +81,10 @@ export default function PetCard({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
 
     card: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         padding: SPACING.lg,
         borderRadius: RADIUS.xl,
         marginVertical: SPACING.sm,
@@ -97,7 +100,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: RADIUS.full,
-        backgroundColor: COLORS.primaryMuted,
+        backgroundColor: colors.primaryMuted,
         alignItems: "center",
         justifyContent: "center",
         marginRight: SPACING.md
@@ -114,12 +117,12 @@ const styles = StyleSheet.create({
     name: {
         fontSize: FONT_SIZE.subtitle,
         fontWeight: FONT_WEIGHT.bold,
-        color: COLORS.text
+        color: colors.text
     },
 
     species: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginTop: 2
     },
 
@@ -137,7 +140,7 @@ const styles = StyleSheet.create({
     },
 
     ageBadge: {
-        backgroundColor: COLORS.primaryMuted,
+        backgroundColor: colors.primaryMuted,
         paddingVertical: SPACING.xs,
         paddingHorizontal: SPACING.sm,
         borderRadius: RADIUS.sm
@@ -146,6 +149,6 @@ const styles = StyleSheet.create({
     ageBadgeText: {
         fontSize: FONT_SIZE.caption,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.primary
+        color: colors.primary
     }
 });

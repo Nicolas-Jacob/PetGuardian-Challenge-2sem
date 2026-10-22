@@ -2,7 +2,9 @@ import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
 import CustomButton from "../components/CustomButton";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useTheme } from "../contexts/ThemeContext";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 import { useAuth } from "../contexts/AuthContext";
@@ -10,6 +12,9 @@ import { useAuth } from "../contexts/AuthContext";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login() {
+
+    const { colors } = useTheme();
+    const styles = useThemedStyles(createStyles);
 
     const { signIn } = useAuth();
 
@@ -76,7 +81,7 @@ export default function Login() {
                         focusedField === "email" && styles.inputFocused
                     ]}
                     placeholder="seu@email.com"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={colors.placeholder}
                     value={email}
                     onChangeText={setEmail}
                     onFocus={() => setFocusedField("email")}
@@ -96,7 +101,7 @@ export default function Login() {
                         focusedField === "password" && styles.inputFocused
                     ]}
                     placeholder="Sua senha"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={colors.placeholder}
                     value={password}
                     onChangeText={setPassword}
                     onFocus={() => setFocusedField("password")}
@@ -129,12 +134,12 @@ export default function Login() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
         padding: SPACING.xl,
-        backgroundColor: COLORS.background
+        backgroundColor: colors.background
     },
 
     logoWrapper: {
@@ -142,7 +147,7 @@ const styles = StyleSheet.create({
         width: 88,
         height: 88,
         borderRadius: RADIUS.full,
-        backgroundColor: COLORS.primaryMuted,
+        backgroundColor: colors.primaryMuted,
         alignItems: "center",
         justifyContent: "center",
         marginBottom: SPACING.lg
@@ -156,7 +161,7 @@ const styles = StyleSheet.create({
         fontSize: TYPOGRAPHY.largeTitle.fontSize,
         fontWeight: TYPOGRAPHY.largeTitle.fontWeight,
         textAlign: "center",
-        color: COLORS.primary
+        color: colors.primary
     },
 
     subtitle: {
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZE.body,
         marginTop: SPACING.sm,
         marginBottom: SPACING.xl,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         lineHeight: 22
     },
 
@@ -175,36 +180,36 @@ const styles = StyleSheet.create({
     label: {
         fontSize: FONT_SIZE.caption,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.xs,
         marginLeft: SPACING.xs
     },
 
     input: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.inputBackground,
         borderWidth: 1.5,
-        borderColor: COLORS.border,
+        borderColor: colors.border,
         padding: SPACING.md,
         borderRadius: RADIUS.md,
         marginBottom: SPACING.md,
         fontSize: FONT_SIZE.body,
-        color: COLORS.text
+        color: colors.text
     },
 
     inputFocused: {
-        borderColor: COLORS.primary,
-        backgroundColor: COLORS.primaryMuted
+        borderColor: colors.primary,
+        backgroundColor: colors.primaryMuted
     },
 
     link: {
         textAlign: "center",
         marginTop: SPACING.md,
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary
+        color: colors.textSecondary
     },
 
     linkHighlight: {
-        color: COLORS.primary,
+        color: colors.primary,
         fontWeight: FONT_WEIGHT.bold
     }
 });

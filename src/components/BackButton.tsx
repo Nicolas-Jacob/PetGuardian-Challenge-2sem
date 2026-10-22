@@ -1,8 +1,11 @@
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 
 export default function BackButton() {
+    const styles = useThemedStyles(createStyles);
+
     return (
         <TouchableOpacity
             style={styles.button}
@@ -16,17 +19,17 @@ export default function BackButton() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     button: {
         alignSelf: "flex-start",
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 12,
         marginTop: 35,
         marginBottom: 20,
 
-        shadowColor: COLORS.shadow,
+        shadowColor: colors.shadow,
         shadowOffset: {
             width: 0,
             height: 2
@@ -37,7 +40,7 @@ const styles = StyleSheet.create({
         elevation: 4
     },
     text: {
-        color: COLORS.text,
+        color: colors.text,
         fontWeight: "bold",
         fontSize: 15
     }

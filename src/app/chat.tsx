@@ -2,7 +2,9 @@ import { useRef, useState } from "react";
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import CustomButton from "../components/CustomButton";
 import BackButton from "../components/BackButton";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useTheme } from "../contexts/ThemeContext";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 
@@ -53,6 +55,9 @@ function getAiResponse(question: string): string {
 }
 
 export default function Chat() {
+
+    const { colors } = useTheme();
+    const styles = useThemedStyles(createStyles);
 
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -158,7 +163,7 @@ export default function Chat() {
             <TextInput
                 style={[styles.input, inputFocused && styles.inputFocused]}
                 placeholder="Pergunte algo..."
-                placeholderTextColor={COLORS.textSecondary}
+                placeholderTextColor={colors.placeholder}
                 value={message}
                 onChangeText={setMessage}
                 onFocus={() => setInputFocused(true)}
@@ -192,23 +197,23 @@ export default function Chat() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flexGrow: 1,
         padding: SPACING.lg,
-        backgroundColor: COLORS.background
+        backgroundColor: colors.background
     },
 
     title: {
         fontSize: TYPOGRAPHY.title.fontSize,
         fontWeight: TYPOGRAPHY.title.fontWeight,
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: SPACING.xs
     },
 
     subtitle: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.lg
     },
 
@@ -218,7 +223,7 @@ const styles = StyleSheet.create({
 
     emptyChat: {
         alignItems: "center",
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         borderRadius: RADIUS.lg,
         padding: SPACING.xl
     },
@@ -230,7 +235,7 @@ const styles = StyleSheet.create({
 
     emptyChatText: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary
+        color: colors.textSecondary
     },
 
     bubbleRow: {
@@ -251,7 +256,7 @@ const styles = StyleSheet.create({
         width: 28,
         height: 28,
         borderRadius: RADIUS.full,
-        backgroundColor: COLORS.primaryMuted,
+        backgroundColor: colors.primaryMuted,
         alignItems: "center",
         justifyContent: "center",
         marginRight: SPACING.xs
@@ -269,12 +274,12 @@ const styles = StyleSheet.create({
     },
 
     bubbleUser: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: colors.primary,
         borderBottomRightRadius: RADIUS.sm
     },
 
     bubbleAi: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         borderBottomLeftRadius: RADIUS.sm,
         ...SHADOWS.subtle
     },
@@ -284,27 +289,27 @@ const styles = StyleSheet.create({
     },
 
     bubbleTextUser: {
-        color: COLORS.white
+        color: colors.textOnPrimary
     },
 
     bubbleTextAi: {
-        color: COLORS.text
+        color: colors.text
     },
 
     input: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.inputBackground,
         borderWidth: 1.5,
-        borderColor: COLORS.border,
+        borderColor: colors.border,
         padding: SPACING.md,
         borderRadius: RADIUS.md,
         marginBottom: SPACING.sm,
         fontSize: FONT_SIZE.body,
-        color: COLORS.text
+        color: colors.text
     },
 
     inputFocused: {
-        borderColor: COLORS.primary,
-        backgroundColor: COLORS.primaryMuted
+        borderColor: colors.primary,
+        backgroundColor: colors.primaryMuted
     },
 
     suggestionTitle: {
@@ -312,7 +317,7 @@ const styles = StyleSheet.create({
         marginBottom: SPACING.sm,
         fontSize: FONT_SIZE.subtitle,
         fontWeight: FONT_WEIGHT.bold,
-        color: COLORS.text
+        color: colors.text
     },
 
     suggestionContainer: {
@@ -320,16 +325,16 @@ const styles = StyleSheet.create({
     },
 
     suggestionButton: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         padding: SPACING.sm,
         borderRadius: RADIUS.md,
         marginBottom: SPACING.sm,
         borderWidth: 1,
-        borderColor: COLORS.border
+        borderColor: colors.border
     },
 
     suggestionText: {
-        color: COLORS.text,
+        color: colors.text,
         fontSize: FONT_SIZE.body
     }
 });

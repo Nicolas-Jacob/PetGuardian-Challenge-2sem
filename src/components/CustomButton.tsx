@@ -1,5 +1,7 @@
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet } from "react-native";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useTheme } from "../contexts/ThemeContext";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT } from "../constants/typography";
 
@@ -14,12 +16,12 @@ interface Props {
     disabled?: boolean;
 }
 
-const VARIANT_STYLES: Record<Variant, { background: string; text: string; border?: string }> = {
-    primary: { background: COLORS.primary, text: COLORS.white },
-    secondary: { background: COLORS.secondary, text: COLORS.white },
-    danger: { background: COLORS.danger, text: COLORS.white },
-    outline: { background: "transparent", text: COLORS.primary, border: COLORS.primary }
-};
+const createVariantStyles = (colors: ThemeColors): Record<Variant, { background: string; text: string; border?: string }> => ({
+    primary: { background: colors.primary, text: colors.textOnPrimary },
+    secondary: { background: colors.secondary, text: colors.textOnPrimary },
+    danger: { background: colors.danger, text: colors.textOnPrimary },
+    outline: { background: "transparent", text: colors.primary, border: colors.primary }
+});
 
 export default function CustomButton({
     title,
@@ -30,7 +32,10 @@ export default function CustomButton({
     disabled = false
 }: Props) {
 
-    const variantStyle = VARIANT_STYLES[variant];
+    const { colors } = useTheme();
+    const styles = useThemedStyles(createStyles);
+
+    const variantStyle = createVariantStyles(colors)[variant];
     const resolvedBackground = backgroundColor ?? variantStyle.background;
 
     return (
@@ -59,7 +64,7 @@ export default function CustomButton({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = () => StyleSheet.create({
     button: {
         paddingVertical: SPACING.md,
         paddingHorizontal: SPACING.lg,

@@ -3,7 +3,9 @@ import { useState } from "react";
 import { router } from "expo-router";
 import CustomButton from "../components/CustomButton";
 import BackButton from "../components/BackButton";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useTheme } from "../contexts/ThemeContext";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 import { useAuth } from "../contexts/AuthContext";
@@ -13,6 +15,9 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type FocusableField = "email" | "password" | "confirmPassword";
 
 export default function Register() {
+
+    const { colors } = useTheme();
+    const styles = useThemedStyles(createStyles);
 
     const { signUp } = useAuth();
 
@@ -85,7 +90,7 @@ export default function Register() {
                         focusedField === "email" && styles.inputFocused
                     ]}
                     placeholder="seu@email.com"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={colors.placeholder}
                     value={email}
                     onChangeText={setEmail}
                     onFocus={() => setFocusedField("email")}
@@ -105,7 +110,7 @@ export default function Register() {
                         focusedField === "password" && styles.inputFocused
                     ]}
                     placeholder="Mínimo 6 caracteres"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={colors.placeholder}
                     value={password}
                     onChangeText={setPassword}
                     onFocus={() => setFocusedField("password")}
@@ -124,7 +129,7 @@ export default function Register() {
                         focusedField === "confirmPassword" && styles.inputFocused
                     ]}
                     placeholder="Repita a senha"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={colors.placeholder}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     onFocus={() => setFocusedField("confirmPassword")}
@@ -157,23 +162,23 @@ export default function Register() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flex: 1,
         padding: SPACING.xl,
-        backgroundColor: COLORS.background
+        backgroundColor: colors.background
     },
 
     title: {
         fontSize: TYPOGRAPHY.title.fontSize,
         fontWeight: TYPOGRAPHY.title.fontWeight,
-        color: COLORS.primary,
+        color: colors.primary,
         marginBottom: SPACING.xs
     },
 
     subtitle: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.xl,
         lineHeight: 22
     },
@@ -185,36 +190,36 @@ const styles = StyleSheet.create({
     label: {
         fontSize: FONT_SIZE.caption,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.xs,
         marginLeft: SPACING.xs
     },
 
     input: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.inputBackground,
         borderWidth: 1.5,
-        borderColor: COLORS.border,
+        borderColor: colors.border,
         padding: SPACING.md,
         borderRadius: RADIUS.md,
         marginBottom: SPACING.md,
         fontSize: FONT_SIZE.body,
-        color: COLORS.text
+        color: colors.text
     },
 
     inputFocused: {
-        borderColor: COLORS.primary,
-        backgroundColor: COLORS.primaryMuted
+        borderColor: colors.primary,
+        backgroundColor: colors.primaryMuted
     },
 
     link: {
         textAlign: "center",
         marginTop: SPACING.md,
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary
+        color: colors.textSecondary
     },
 
     linkHighlight: {
-        color: COLORS.primary,
+        color: colors.primary,
         fontWeight: FONT_WEIGHT.bold
     }
 });

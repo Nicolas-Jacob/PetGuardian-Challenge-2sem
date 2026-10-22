@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { HistoryRecord } from "../types";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT } from "../constants/typography";
 
@@ -15,6 +16,8 @@ export default function HistoryRecordCard({
     onPress,
     onDelete
 }: Props) {
+    const styles = useThemedStyles(createStyles);
+
     return (
         <TouchableOpacity
             style={styles.card}
@@ -53,12 +56,12 @@ export default function HistoryRecordCard({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
 
     card: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         padding: SPACING.md,
         borderRadius: RADIUS.lg,
         marginBottom: SPACING.md,
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: RADIUS.full,
-        backgroundColor: COLORS.primaryMuted,
+        backgroundColor: colors.primaryMuted,
         alignItems: "center",
         justifyContent: "center",
         marginRight: SPACING.md
@@ -86,12 +89,12 @@ const styles = StyleSheet.create({
     description: {
         fontSize: FONT_SIZE.body,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.text
+        color: colors.text
     },
 
     date: {
         fontSize: FONT_SIZE.caption,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginTop: 2
     },
 

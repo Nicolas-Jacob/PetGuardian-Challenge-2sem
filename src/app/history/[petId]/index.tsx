@@ -4,12 +4,17 @@ import BackButton from "../../../components/BackButton";
 import CustomButton from "../../../components/CustomButton";
 import EmptyState from "../../../components/EmptyState";
 import HistoryRecordCard from "../../../components/HistoryRecordCard";
-import { COLORS } from "../../../constants/colors";
+import { ThemeColors } from "../../../constants/colors";
+import { useTheme } from "../../../contexts/ThemeContext";
+import { useThemedStyles } from "../../../hooks/useThemedStyles";
 import { SPACING } from "../../../constants/spacing";
 import { FONT_SIZE, TYPOGRAPHY } from "../../../constants/typography";
 import { useHistoryByPet, useDeleteHistoryRecord } from "../../../hooks/useHistory";
 
 export default function HistoryList() {
+
+    const { colors } = useTheme();
+    const styles = useThemedStyles(createStyles);
 
     const { petId } = useLocalSearchParams<{ petId: string }>();
     const { data: history = [], isPending, isError } = useHistoryByPet(petId);
@@ -60,7 +65,7 @@ export default function HistoryList() {
 
                 <ActivityIndicator
                     size="large"
-                    color={COLORS.primary}
+                    color={colors.primary}
                     style={styles.loading}
                 />
 
@@ -113,23 +118,23 @@ export default function HistoryList() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flex: 1,
         padding: SPACING.lg,
-        backgroundColor: COLORS.background
+        backgroundColor: colors.background
     },
 
     title: {
         fontSize: TYPOGRAPHY.title.fontSize,
         fontWeight: TYPOGRAPHY.title.fontWeight,
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: SPACING.xs
     },
 
     subtitle: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.lg
     },
 

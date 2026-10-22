@@ -2,12 +2,17 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { router } from "expo-router";
 import BackButton from "../../components/BackButton";
 import EmptyState from "../../components/EmptyState";
-import { COLORS } from "../../constants/colors";
+import { ThemeColors } from "../../constants/colors";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useThemedStyles } from "../../hooks/useThemedStyles";
 import { SPACING, RADIUS, SHADOWS } from "../../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../../constants/typography";
 import { usePets } from "../../hooks/usePets";
 
 export default function HistoryPetList() {
+
+    const { colors } = useTheme();
+    const styles = useThemedStyles(createStyles);
 
     const { data: pets = [], isPending, isError } = usePets();
 
@@ -27,7 +32,7 @@ export default function HistoryPetList() {
 
                 <ActivityIndicator
                     size="large"
-                    color={COLORS.primary}
+                    color={colors.primary}
                     style={styles.loading}
                 />
 
@@ -91,23 +96,23 @@ export default function HistoryPetList() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flex: 1,
         padding: SPACING.lg,
-        backgroundColor: COLORS.background
+        backgroundColor: colors.background
     },
 
     title: {
         fontSize: TYPOGRAPHY.title.fontSize,
         fontWeight: TYPOGRAPHY.title.fontWeight,
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: SPACING.xs
     },
 
     subtitle: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.lg
     },
 
@@ -118,7 +123,7 @@ const styles = StyleSheet.create({
     petRow: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         padding: SPACING.md,
         borderRadius: RADIUS.lg,
         marginBottom: SPACING.sm,
@@ -129,7 +134,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: RADIUS.full,
-        backgroundColor: COLORS.primaryMuted,
+        backgroundColor: colors.primaryMuted,
         alignItems: "center",
         justifyContent: "center",
         marginRight: SPACING.md
@@ -146,17 +151,17 @@ const styles = StyleSheet.create({
     petName: {
         fontSize: FONT_SIZE.body,
         fontWeight: FONT_WEIGHT.bold,
-        color: COLORS.text
+        color: colors.text
     },
 
     petInfo: {
         fontSize: FONT_SIZE.caption,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginTop: 2
     },
 
     chevron: {
         fontSize: FONT_SIZE.title,
-        color: COLORS.textSecondary
+        color: colors.textSecondary
     }
 });

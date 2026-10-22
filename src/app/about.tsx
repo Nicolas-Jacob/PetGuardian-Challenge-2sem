@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import Constants from "expo-constants";
 import BackButton from "../components/BackButton";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 
@@ -14,6 +15,8 @@ const MEMBERS = [
 ];
 
 export default function About() {
+
+    const styles = useThemedStyles(createStyles);
 
     const version = Constants.expoConfig?.version ?? "—";
     const commitHash = Constants.expoConfig?.extra?.commitHash ?? "unknown";
@@ -91,22 +94,22 @@ export default function About() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         padding: SPACING.lg,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
         flexGrow: 1
     },
 
     title: {
         fontSize: TYPOGRAPHY.title.fontSize,
         fontWeight: TYPOGRAPHY.title.fontWeight,
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: SPACING.md
     },
 
     card: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         padding: SPACING.md,
         borderRadius: RADIUS.lg,
         marginBottom: SPACING.sm,
@@ -116,7 +119,7 @@ const styles = StyleSheet.create({
     appName: {
         fontSize: FONT_SIZE.subtitle,
         fontWeight: FONT_WEIGHT.bold,
-        color: COLORS.primary,
+        color: colors.primary,
         marginBottom: SPACING.sm
     },
 
@@ -129,19 +132,19 @@ const styles = StyleSheet.create({
 
     infoLabel: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary
+        color: colors.textSecondary
     },
 
     infoValue: {
         fontSize: FONT_SIZE.body,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.text
+        color: colors.text
     },
 
     hash: {
         fontFamily: "monospace",
-        color: COLORS.primaryDark,
-        backgroundColor: COLORS.primaryMuted,
+        color: colors.primaryDark,
+        backgroundColor: colors.primaryMuted,
         paddingVertical: 2,
         paddingHorizontal: SPACING.sm,
         borderRadius: RADIUS.sm,
@@ -151,14 +154,14 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: FONT_SIZE.subtitle,
         fontWeight: FONT_WEIGHT.bold,
-        color: COLORS.text,
+        color: colors.text,
         marginTop: SPACING.lg,
         marginBottom: SPACING.sm
     },
 
     description: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.text,
+        color: colors.text,
         lineHeight: 22
     },
 
@@ -168,18 +171,18 @@ const styles = StyleSheet.create({
 
     memberDivider: {
         borderBottomWidth: 1,
-        borderBottomColor: COLORS.border
+        borderBottomColor: colors.border
     },
 
     memberName: {
         fontSize: FONT_SIZE.body,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.text
+        color: colors.text
     },
 
     memberInfo: {
         fontSize: FONT_SIZE.caption,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginTop: 2
     }
 });

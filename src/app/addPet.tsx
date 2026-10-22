@@ -4,13 +4,18 @@ import { router } from "expo-router";
 import { useAddPet } from "../hooks/usePets";
 import CustomButton from "../components/CustomButton";
 import BackButton from "../components/BackButton";
-import { COLORS } from "../constants/colors";
+import { ThemeColors } from "../constants/colors";
+import { useTheme } from "../contexts/ThemeContext";
+import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 
 type FocusableField = "name" | "species" | "age";
 
 export default function AddPet() {
+
+    const { colors } = useTheme();
+    const styles = useThemedStyles(createStyles);
 
     const addPet = useAddPet();
 
@@ -82,7 +87,7 @@ export default function AddPet() {
                         focusedField === "name" && styles.inputFocused
                     ]}
                     placeholder="Ex: Rex"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={colors.placeholder}
                     value={name}
                     onChangeText={setName}
                     onFocus={() => setFocusedField("name")}
@@ -100,7 +105,7 @@ export default function AddPet() {
                         focusedField === "species" && styles.inputFocused
                     ]}
                     placeholder="Ex: Cachorro"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={colors.placeholder}
                     value={species}
                     onChangeText={setSpecies}
                     onFocus={() => setFocusedField("species")}
@@ -118,7 +123,7 @@ export default function AddPet() {
                         focusedField === "age" && styles.inputFocused
                     ]}
                     placeholder="Ex: 3"
-                    placeholderTextColor={COLORS.textSecondary}
+                    placeholderTextColor={colors.placeholder}
                     value={age}
                     onChangeText={setAge}
                     onFocus={() => setFocusedField("age")}
@@ -163,23 +168,23 @@ export default function AddPet() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
         flex: 1,
         padding: SPACING.lg,
-        backgroundColor: COLORS.background
+        backgroundColor: colors.background
     },
 
     title: {
         fontSize: TYPOGRAPHY.title.fontSize,
         fontWeight: TYPOGRAPHY.title.fontWeight,
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: SPACING.xs
     },
 
     subtitle: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.lg
     },
 
@@ -190,29 +195,29 @@ const styles = StyleSheet.create({
     label: {
         fontSize: FONT_SIZE.caption,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.xs,
         marginLeft: SPACING.xs
     },
 
     input: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.inputBackground,
         borderWidth: 1.5,
-        borderColor: COLORS.border,
+        borderColor: colors.border,
         padding: SPACING.md,
         borderRadius: RADIUS.md,
         marginBottom: SPACING.md,
         fontSize: FONT_SIZE.body,
-        color: COLORS.text
+        color: colors.text
     },
 
     inputFocused: {
-        borderColor: COLORS.primary,
-        backgroundColor: COLORS.primaryMuted
+        borderColor: colors.primary,
+        backgroundColor: colors.primaryMuted
     },
 
     previewCard: {
-        backgroundColor: COLORS.card,
+        backgroundColor: colors.card,
         padding: SPACING.lg,
         borderRadius: RADIUS.lg,
         marginVertical: SPACING.lg
@@ -221,7 +226,7 @@ const styles = StyleSheet.create({
     previewTitle: {
         fontSize: FONT_SIZE.caption,
         fontWeight: FONT_WEIGHT.bold,
-        color: COLORS.textSecondary,
+        color: colors.textSecondary,
         marginBottom: SPACING.sm,
         textTransform: "uppercase"
     },
@@ -234,12 +239,12 @@ const styles = StyleSheet.create({
 
     previewLabel: {
         fontSize: FONT_SIZE.body,
-        color: COLORS.textSecondary
+        color: colors.textSecondary
     },
 
     previewValue: {
         fontSize: FONT_SIZE.body,
         fontWeight: FONT_WEIGHT.semibold,
-        color: COLORS.text
+        color: colors.text
     }
 });
