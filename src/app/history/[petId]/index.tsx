@@ -16,7 +16,7 @@ export default function HistoryList() {
     const { colors } = useTheme();
     const styles = useThemedStyles(createStyles);
 
-    const { petId } = useLocalSearchParams<{ petId: string }>();
+    const { petId, highlight } = useLocalSearchParams<{ petId: string; highlight?: string }>();
     const { data: history = [], isPending, isError } = useHistoryByPet(petId);
     const deleteRecord = useDeleteHistoryRecord();
 
@@ -83,6 +83,7 @@ export default function HistoryList() {
                     <HistoryRecordCard
                         key={record.id}
                         record={record}
+                        highlighted={!!highlight && record.id === highlight}
                         onPress={() =>
                             router.push({
                                 pathname: "/history/[petId]/edit/[recordId]",

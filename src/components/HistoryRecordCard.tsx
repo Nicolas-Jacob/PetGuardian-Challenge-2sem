@@ -8,12 +8,14 @@ import { formatReminder } from "../utils/dateTime";
 
 interface Props {
     record: HistoryRecord;
+    highlighted?: boolean;
     onPress?: () => void;
     onDelete?: () => void;
 }
 
 export default function HistoryRecordCard({
     record,
+    highlighted = false,
     onPress,
     onDelete
 }: Props) {
@@ -21,12 +23,12 @@ export default function HistoryRecordCard({
 
     return (
         <TouchableOpacity
-            style={styles.card}
+            style={[styles.card, highlighted && styles.cardHighlighted]}
             activeOpacity={0.85}
             onPress={onPress}
             disabled={!onPress}
         >
-            <View style={styles.iconWrapper}>
+            <View style={[styles.iconWrapper, highlighted && styles.iconWrapperHighlighted]}>
                 <Text style={styles.icon}>
                     📋
                 </Text>
@@ -75,6 +77,12 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         ...SHADOWS.subtle
     },
 
+    cardHighlighted: {
+        borderWidth: 2,
+        borderColor: colors.primary,
+        backgroundColor: colors.primaryMuted
+    },
+
     iconWrapper: {
         width: 40,
         height: 40,
@@ -83,6 +91,10 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginRight: SPACING.md
+    },
+
+    iconWrapperHighlighted: {
+        backgroundColor: colors.card
     },
 
     icon: {

@@ -8,6 +8,7 @@ import { ThemeProvider, useTheme } from "../contexts/ThemeContext";
 import { useThemedStyles } from "../hooks/useThemedStyles";
 import { ThemeColors } from "../constants/colors";
 import { initNotifications } from "../services/notificationService";
+import { useNotificationNavigation } from "../hooks/useNotificationNavigation";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,8 @@ function RootLayoutNav() {
     const { user, loading } = useAuth();
     const segments = useSegments();
     const router = useRouter();
+
+    useNotificationNavigation();
 
     useEffect(() => {
 

@@ -4,6 +4,9 @@ import { AndroidImportance } from "expo-notifications";
 
 const REMINDER_CHANNEL_ID = "lembretes";
 
+// recordId é opcional: lembretes agendados antes dele existir não o trazem
+export type NotificationTarget = { petId: string; recordId?: string };
+
 let initialized = false;
 
 function reminderIdentifier(recordId: string): string {
@@ -75,7 +78,7 @@ export async function scheduleHistoryReminder({
         content: {
             title: `Lembrete de saúde: ${petName}`,
             body: `Hora de cuidar: ${description}`,
-            data: { petId, type: "history-reminder" }
+            data: { petId, recordId, type: "history-reminder" }
         },
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -89,4 +92,65 @@ export async function scheduleHistoryReminder({
 
 export async function cancelHistoryReminder(recordId: string): Promise<void> {
     await Notifications.cancelScheduledNotificationAsync(reminderIdentifier(recordId));
+}
+
+// Função pura: só interpreta o toque, não navega
+export function parseNotificationTarget(
+    response: Notifications.NotificationResponse
+): NotificationTarget | null {
+
+    const data = response.notification.request.content.data;
+
+    if (!data || data.type !== "history-reminder") return null;
+    if (typeof data.petId !== "string" || data.petId.length === 0) return null;
+
+    const recordId =
+        typeof data.recordId === "string" && data.recordId.length > 0
+            ? data.recordId
+            : undefined;
+
+    return recordId ? { petId: data.petId, recordId } : { petId: data.petId };
+}
+
+// Respostas já tratadas nesta execução; clearLastNotificationResponse cobre recargas
+const handledResponses = new Set<string>();
+
+function consumeResponse(
+    response: Notifications.NotificationResponse | null
+): NotificationTarget | null {
+
+    if (!response) return null;
+    if (response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return null;
+
+    const key = `${response.notification.request.identifier}:${response.notification.date}`;
+
+    if (handledResponses.has(key)) return null;
+
+    const target = parseNotificationTarget(response);
+
+    if (!target) return null;
+
+    handledResponses.add(key);
+    Notifications.clearLastNotificationResponse();
+
+    return target;
+}
+
+// Toque que abriu o app a partir do estado fechado (cold start)
+export function consumeInitialNotificationTarget(): NotificationTarget | null {
+    return consumeResponse(Notifications.getLastNotificationResponse());
+}
+
+// Toques com o app em foreground ou background
+export function addNotificationTargetListener(
+    listener: (target: NotificationTarget) => void
+): () => void {
+
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+        const target = consumeResponse(response);
+
+        if (target) listener(target);
+    });
+
+    return () => subscription.remove();
 }
