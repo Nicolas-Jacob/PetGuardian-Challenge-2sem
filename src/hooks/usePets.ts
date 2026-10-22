@@ -2,6 +2,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { useResourceMutation } from "./createResourceHooks";
 import { getPets, addPet, updatePet, deletePet } from "../services/petsService";
+import { getHistoryByPet, deleteHistoryRecord } from "../services/historyService";
+import { cancelHistoryReminder } from "../services/notificationService";
 import { Pet } from "../types";
 
 export function usePets() {
@@ -42,8 +44,31 @@ export function useUpdatePet() {
 }
 
 export function useDeletePet() {
+
+    const queryClient = useQueryClient();
+
     return useResourceMutation(
-        (uid, petId: string) => deletePet(uid, petId),
+        async (uid, petId: string) => {
+
+            // Remove o histórico antes do pet para não deixar registros nem lembretes órfãos
+            const records = await getHistoryByPet(uid, petId);
+
+            await Promise.all(
+                records.map((record) =>
+                    cancelHistoryReminder(record.id).catch((error) => {
+                        console.warn(`Não foi possível cancelar o lembrete ${record.id}.`, error);
+                    })
+                )
+            );
+
+            await Promise.all(
+                records.map((record) => deleteHistoryRecord(uid, record.id))
+            );
+
+            await deletePet(uid, petId);
+
+            queryClient.invalidateQueries({ queryKey: ["history", uid, petId] });
+        },
         (uid) => ["pets", uid]
     );
 }

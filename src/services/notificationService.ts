@@ -7,10 +7,12 @@ const REMINDER_CHANNEL_ID = "lembretes";
 // recordId é opcional: lembretes agendados antes dele existir não o trazem
 export type NotificationTarget = { petId: string; recordId?: string };
 
+const REMINDER_ID_PREFIX = "history-reminder-";
+
 let initialized = false;
 
 function reminderIdentifier(recordId: string): string {
-    return `history-reminder-${recordId}`;
+    return `${REMINDER_ID_PREFIX}${recordId}`;
 }
 
 export function initNotifications(): void {
@@ -35,6 +37,17 @@ export function initNotifications(): void {
         }).catch(() => {
             initialized = false;
         });
+    }
+}
+
+// Só consulta; nunca abre o diálogo de permissão
+export async function hasNotificationPermission(): Promise<boolean> {
+    try {
+        const current = await Notifications.getPermissionsAsync();
+
+        return current.granted;
+    } catch {
+        return false;
     }
 }
 
@@ -92,6 +105,26 @@ export async function scheduleHistoryReminder({
 
 export async function cancelHistoryReminder(recordId: string): Promise<void> {
     await Notifications.cancelScheduledNotificationAsync(reminderIdentifier(recordId));
+}
+
+// Cancela apenas os lembretes de histórico, preservando outros tipos de notificação
+export async function cancelAllHistoryReminders(): Promise<void> {
+    try {
+        const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+
+        const reminders = scheduled.filter((request) =>
+            request.identifier.startsWith(REMINDER_ID_PREFIX) ||
+            request.content.data?.type === "history-reminder"
+        );
+
+        await Promise.all(
+            reminders.map((request) =>
+                Notifications.cancelScheduledNotificationAsync(request.identifier)
+            )
+        );
+    } catch (error) {
+        console.warn("Não foi possível cancelar os lembretes agendados.", error);
+    }
 }
 
 // Função pura: só interpreta o toque, não navega

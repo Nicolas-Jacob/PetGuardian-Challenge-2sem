@@ -9,6 +9,7 @@ import { useThemedStyles } from "../hooks/useThemedStyles";
 import { ThemeColors } from "../constants/colors";
 import { initNotifications } from "../services/notificationService";
 import { useNotificationNavigation } from "../hooks/useNotificationNavigation";
+import { useReminderSync } from "../hooks/useReminderSync";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ function RootLayoutNav() {
     const router = useRouter();
 
     useNotificationNavigation();
+    useReminderSync();
 
     useEffect(() => {
 

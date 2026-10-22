@@ -8,6 +8,10 @@ const historyCrud = createFirestoreCrud<HistoryRecord>(
     (uid) => ["users", uid, "history"]
 );
 
+export async function getAllHistory(uid: string): Promise<HistoryRecord[]> {
+    return historyCrud.getAll(uid);
+}
+
 export async function getHistoryByPet(
     uid: string,
     petId: string

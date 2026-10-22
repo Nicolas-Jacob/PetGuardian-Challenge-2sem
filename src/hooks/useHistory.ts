@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { useResourceMutation } from "./createResourceHooks";
 import {
@@ -7,7 +7,11 @@ import {
     updateHistoryRecord,
     deleteHistoryRecord
 } from "../services/historyService";
-import { scheduleHistoryReminder, cancelHistoryReminder } from "../services/notificationService";
+import {
+    scheduleHistoryReminder,
+    cancelHistoryReminder,
+    hasNotificationPermission
+} from "../services/notificationService";
 import { HistoryRecord } from "../types";
 
 interface ReminderResult {
@@ -83,6 +87,9 @@ export function useAddHistoryRecord() {
 }
 
 export function useUpdateHistoryRecord() {
+
+    const queryClient = useQueryClient();
+
     return useResourceMutation(
         async (
             uid,
@@ -101,6 +108,11 @@ export function useUpdateHistoryRecord() {
             }
         ): Promise<ReminderResult> => {
 
+            // Versão anterior do registro, lida do cache antes da invalidação
+            const cachedRecord = queryClient
+                .getQueryData<HistoryRecord[]>(["history", uid, petId])
+                ?.find((record) => record.id === recordId);
+
             const { reminderAt, ...rest } = data;
 
             // reminderAt undefined = lembrete não foi tocado; null = removido
@@ -115,6 +127,29 @@ export function useUpdateHistoryRecord() {
             );
 
             if (!reminderChanged) {
+
+                const activeReminderAt = previousReminderAt ?? cachedRecord?.reminderAt ?? null;
+                const descriptionChanged =
+                    rest.description !== undefined &&
+                    rest.description !== cachedRecord?.description;
+
+                // Mesmo identificador: o novo agendamento substitui o texto antigo.
+                // Sem permissão já concedida não reagenda (e nunca pede permissão aqui).
+                if (
+                    descriptionChanged &&
+                    typeof activeReminderAt === "number" &&
+                    activeReminderAt > Date.now() &&
+                    await hasNotificationPermission()
+                ) {
+                    await safeSchedule({
+                        recordId,
+                        petId,
+                        petName,
+                        description: rest.description ?? "",
+                        reminderAt: activeReminderAt
+                    });
+                }
+
                 return { reminderRequested: false, reminderScheduled: false };
             }
 

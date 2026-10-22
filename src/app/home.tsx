@@ -35,7 +35,7 @@ export default function Home() {
     function confirmDelete(petId: string, petName: string) {
         Alert.alert(
             "Excluir pet",
-            `Tem certeza que deseja excluir ${petName}?`,
+            `Tem certeza que deseja excluir ${petName}? Todo o histórico clínico e os lembretes deste pet também serão excluídos.`,
             [
                 {
                     text: "Cancelar",
