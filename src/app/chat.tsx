@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, StyleSheet, ScrollView, ScrollViewInstance, TouchableOpacity } from "react-native";
 import CustomButton from "../components/CustomButton";
 import BackButton from "../components/BackButton";
 import { ThemeColors } from "../constants/colors";
@@ -62,7 +62,7 @@ export default function Chat() {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputFocused, setInputFocused] = useState(false);
-    const scrollViewRef = useRef<ScrollView>(null);
+    const scrollViewRef = useRef<ScrollViewInstance>(null);
 
     const suggestions = [
         "Quando devo vacinar meu pet?",
