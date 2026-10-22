@@ -192,6 +192,26 @@ export default function Home() {
                 </Text>
             </TouchableOpacity>
 
+            <TouchableOpacity
+                style={styles.navCard}
+                activeOpacity={0.8}
+                onPress={() => router.push("/about")}
+            >
+                <View style={[styles.navIconWrapper, { backgroundColor: COLORS.border }]}>
+                    <Text style={styles.navIcon}>
+                        ℹ️
+                    </Text>
+                </View>
+
+                <Text style={styles.navLabel}>
+                    Sobre o App
+                </Text>
+
+                <Text style={styles.navChevron}>
+                    ›
+                </Text>
+            </TouchableOpacity>
+
         </ScrollView>
     );
 }
