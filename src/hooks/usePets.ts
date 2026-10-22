@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { useResourceMutation } from "./createResourceHooks";
 import { getPets, addPet, updatePet, deletePet } from "../services/petsService";
@@ -13,6 +13,17 @@ export function usePets() {
         queryFn: () => getPets(user!.uid),
         enabled: !!user
     });
+}
+
+// Lê o pet do cache já carregado por usePets, sem disparar nova busca
+export function usePetById(petId: string): Pet | undefined {
+
+    const { user } = useAuth();
+    const queryClient = useQueryClient();
+
+    return queryClient
+        .getQueryData<Pet[]>(["pets", user?.uid])
+        ?.find((pet) => pet.id === petId);
 }
 
 export function useAddPet() {

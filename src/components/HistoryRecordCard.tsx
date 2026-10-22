@@ -4,6 +4,7 @@ import { ThemeColors } from "../constants/colors";
 import { useThemedStyles } from "../hooks/useThemedStyles";
 import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT } from "../constants/typography";
+import { formatReminder } from "../utils/dateTime";
 
 interface Props {
     record: HistoryRecord;
@@ -39,6 +40,12 @@ export default function HistoryRecordCard({
                 <Text style={styles.date}>
                     {record.date}
                 </Text>
+
+                {record.reminderAt ? (
+                    <Text style={styles.reminder}>
+                        🔔 Lembrete: {formatReminder(record.reminderAt)}
+                    </Text>
+                ) : null}
             </View>
 
             {onDelete && (
@@ -95,6 +102,13 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     date: {
         fontSize: FONT_SIZE.caption,
         color: colors.textSecondary,
+        marginTop: 2
+    },
+
+    reminder: {
+        fontSize: FONT_SIZE.caption,
+        fontWeight: FONT_WEIGHT.medium,
+        color: colors.primary,
         marginTop: 2
     },
 

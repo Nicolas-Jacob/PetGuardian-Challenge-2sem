@@ -1,14 +1,18 @@
-import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert, ActivityIndicator, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useHistoryByPet, useUpdateHistoryRecord } from "../../../../hooks/useHistory";
+import { usePetById } from "../../../../hooks/usePets";
 import CustomButton from "../../../../components/CustomButton";
 import BackButton from "../../../../components/BackButton";
+import ReminderFields from "../../../../components/ReminderFields";
 import { ThemeColors } from "../../../../constants/colors";
 import { useTheme } from "../../../../contexts/ThemeContext";
 import { useThemedStyles } from "../../../../hooks/useThemedStyles";
 import { SPACING, RADIUS } from "../../../../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../../../../constants/typography";
+import { splitReminder } from "../../../../utils/dateTime";
+import { resolveReminderInput, getReminderFeedback } from "../../../../utils/reminder";
 
 type FocusableField = "description" | "date";
 
@@ -19,18 +23,25 @@ export default function EditHistoryRecord() {
 
     const { petId, recordId } = useLocalSearchParams<{ petId: string; recordId: string }>();
     const { data: history = [], isPending: isLoadingHistory } = useHistoryByPet(petId);
+    const pet = usePetById(petId);
     const updateRecord = useUpdateHistoryRecord();
 
     const record = history.find((item) => item.id === recordId);
 
     const [description, setDescription] = useState("");
     const [date, setDate] = useState("");
+    const [reminderDate, setReminderDate] = useState("");
+    const [reminderTime, setReminderTime] = useState("");
     const [focusedField, setFocusedField] = useState<FocusableField | null>(null);
 
     useEffect(() => {
         if (record) {
             setDescription(record.description);
             setDate(record.date);
+
+            const reminder = record.reminderAt ? splitReminder(record.reminderAt) : null;
+            setReminderDate(reminder?.date ?? "");
+            setReminderTime(reminder?.time ?? "");
         }
     }, [record]);
 
@@ -43,20 +54,33 @@ export default function EditHistoryRecord() {
             return;
         }
 
+        const reminder = resolveReminderInput(reminderDate, reminderTime, record?.reminderAt);
+
+        if (!reminder.ok) {
+            Alert.alert("Lembrete inválido", reminder.message);
+            return;
+        }
+
         try {
-            await updateRecord.mutateAsync({
+            const result = await updateRecord.mutateAsync({
                 recordId,
                 petId,
+                petName: pet?.name ?? "seu pet",
+                previousReminderAt: record?.reminderAt,
                 data: {
                     description: description.trim(),
-                    date: date.trim()
+                    date: date.trim(),
+                    reminderAt: reminder.reminderAt
                 }
             });
 
-            Alert.alert(
-                "Sucesso",
-                "Registro atualizado com sucesso"
+            const feedback = getReminderFeedback(
+                "Registro atualizado com sucesso",
+                result,
+                reminder.reminderAt
             );
+
+            Alert.alert(feedback.title, feedback.message);
 
             router.back();
         } catch (error) {
@@ -89,7 +113,10 @@ export default function EditHistoryRecord() {
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView
+            contentContainerStyle={styles.container}
+            keyboardShouldPersistTaps="handled"
+        >
             <BackButton />
 
             <Text style={styles.title}>
@@ -138,6 +165,14 @@ export default function EditHistoryRecord() {
                     editable={!updateRecord.isPending}
                 />
 
+                <ReminderFields
+                    date={reminderDate}
+                    time={reminderTime}
+                    onChangeDate={setReminderDate}
+                    onChangeTime={setReminderTime}
+                    editable={!updateRecord.isPending}
+                />
+
             </View>
 
             <View style={styles.previewCard}>
@@ -156,6 +191,13 @@ export default function EditHistoryRecord() {
                     <Text style={styles.previewValue}>{date || "—"}</Text>
                 </View>
 
+                <View style={styles.previewRow}>
+                    <Text style={styles.previewLabel}>Lembrete</Text>
+                    <Text style={styles.previewValue}>
+                        {reminderDate || reminderTime ? `${reminderDate} ${reminderTime}`.trim() : "—"}
+                    </Text>
+                </View>
+
             </View>
 
             <CustomButton
@@ -163,13 +205,13 @@ export default function EditHistoryRecord() {
                 onPress={handleSave}
                 loading={updateRecord.isPending}
             />
-        </View>
+        </ScrollView>
     );
 }
 
 const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         padding: SPACING.lg,
         backgroundColor: colors.background
     },

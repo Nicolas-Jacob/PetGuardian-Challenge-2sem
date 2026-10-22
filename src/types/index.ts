@@ -11,5 +11,6 @@ export interface HistoryRecord {
   petId: string;
   description: string;
   date: string;
+  reminderAt?: number | null;
   createdAt: number;
 }

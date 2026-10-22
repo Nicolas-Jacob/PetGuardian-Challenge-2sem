@@ -12,7 +12,7 @@ export async function addPet(
     uid: string,
     data: Omit<Pet, "id" | "createdAt">
 ): Promise<void> {
-    return petsCrud.add(uid, data);
+    await petsCrud.add(uid, data);
 }
 
 export async function updatePet(

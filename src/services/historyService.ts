@@ -27,7 +27,7 @@ export async function getHistoryByPet(
 export async function addHistoryRecord(
     uid: string,
     data: Omit<HistoryRecord, "id" | "createdAt">
-): Promise<void> {
+): Promise<string> {
     return historyCrud.add(uid, data);
 }
 

@@ -7,7 +7,38 @@ import {
     updateHistoryRecord,
     deleteHistoryRecord
 } from "../services/historyService";
+import { scheduleHistoryReminder, cancelHistoryReminder } from "../services/notificationService";
 import { HistoryRecord } from "../types";
+
+interface ReminderResult {
+    reminderRequested: boolean;
+    reminderScheduled: boolean;
+}
+
+interface ReminderTarget {
+    recordId: string;
+    petId: string;
+    petName: string;
+    description: string;
+    reminderAt: number;
+}
+
+// Falhas de notificação nunca devem desfazer o que já foi salvo no Firestore
+async function safeSchedule({ reminderAt, ...target }: ReminderTarget): Promise<boolean> {
+    try {
+        return await scheduleHistoryReminder({ ...target, at: new Date(reminderAt) });
+    } catch {
+        return false;
+    }
+}
+
+async function safeCancel(recordId: string): Promise<void> {
+    try {
+        await cancelHistoryReminder(recordId);
+    } catch {
+        // Nada agendado para este registro
+    }
+}
 
 export function useHistoryByPet(petId: string) {
 
@@ -22,26 +53,97 @@ export function useHistoryByPet(petId: string) {
 
 export function useAddHistoryRecord() {
     return useResourceMutation(
-        (uid, data: Omit<HistoryRecord, "id" | "createdAt">) =>
-            addHistoryRecord(uid, data),
-        (uid, data) => ["history", uid, data.petId]
+        async (
+            uid,
+            { petName, reminderAt, ...data }: Omit<HistoryRecord, "id" | "createdAt"> & { petName: string }
+        ): Promise<ReminderResult & { id: string }> => {
+
+            const hasReminder = typeof reminderAt === "number";
+
+            // Sem lembrete a chave é omitida: o Firestore rejeita undefined
+            const id = await addHistoryRecord(
+                uid,
+                hasReminder ? { ...data, reminderAt } : data
+            );
+
+            const reminderScheduled = hasReminder
+                ? await safeSchedule({
+                    recordId: id,
+                    petId: data.petId,
+                    petName,
+                    description: data.description,
+                    reminderAt
+                })
+                : false;
+
+            return { id, reminderRequested: hasReminder, reminderScheduled };
+        },
+        (uid, variables) => ["history", uid, variables.petId]
     );
 }
 
 export function useUpdateHistoryRecord() {
     return useResourceMutation(
-        (
+        async (
             uid,
-            { recordId, data }: { recordId: string; petId: string; data: Partial<HistoryRecord> }
-        ) => updateHistoryRecord(uid, recordId, data),
+            {
+                recordId,
+                petId,
+                data,
+                petName,
+                previousReminderAt
+            }: {
+                recordId: string;
+                petId: string;
+                data: Partial<HistoryRecord>;
+                petName: string;
+                previousReminderAt?: number | null;
+            }
+        ): Promise<ReminderResult> => {
+
+            const { reminderAt, ...rest } = data;
+
+            // reminderAt undefined = lembrete não foi tocado; null = removido
+            const reminderChanged =
+                reminderAt !== undefined &&
+                (reminderAt ?? null) !== (previousReminderAt ?? null);
+
+            await updateHistoryRecord(
+                uid,
+                recordId,
+                reminderChanged ? { ...rest, reminderAt } : rest
+            );
+
+            if (!reminderChanged) {
+                return { reminderRequested: false, reminderScheduled: false };
+            }
+
+            await safeCancel(recordId);
+
+            if (typeof reminderAt !== "number") {
+                return { reminderRequested: false, reminderScheduled: false };
+            }
+
+            const reminderScheduled = await safeSchedule({
+                recordId,
+                petId,
+                petName,
+                description: rest.description ?? "",
+                reminderAt
+            });
+
+            return { reminderRequested: true, reminderScheduled };
+        },
         (uid, variables) => ["history", uid, variables.petId]
     );
 }
 
 export function useDeleteHistoryRecord() {
     return useResourceMutation(
-        (uid, { recordId }: { recordId: string; petId: string }) =>
-            deleteHistoryRecord(uid, recordId),
+        async (uid, { recordId }: { recordId: string; petId: string }) => {
+            await deleteHistoryRecord(uid, recordId);
+            await safeCancel(recordId);
+        },
         (uid, variables) => ["history", uid, variables.petId]
     );
 }

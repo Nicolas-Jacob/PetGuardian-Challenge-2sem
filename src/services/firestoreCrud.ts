@@ -51,12 +51,14 @@ export function createFirestoreCrud<T extends { id: string }>(
         async add(
             uid: string,
             data: Omit<T, "id" | "createdAt">
-        ): Promise<void> {
+        ): Promise<string> {
 
-            await addDoc(collectionRef(uid), {
+            const created = await addDoc(collectionRef(uid), {
                 ...data,
                 createdAt: Date.now()
             });
+
+            return created.id;
         },
 
         async update(

@@ -7,8 +7,11 @@ import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import { ThemeProvider, useTheme } from "../contexts/ThemeContext";
 import { useThemedStyles } from "../hooks/useThemedStyles";
 import { ThemeColors } from "../constants/colors";
+import { initNotifications } from "../services/notificationService";
 
 const queryClient = new QueryClient();
+
+initNotifications();
 
 function RootLayoutNav() {
 

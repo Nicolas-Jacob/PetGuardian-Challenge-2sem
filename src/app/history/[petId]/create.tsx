@@ -1,14 +1,17 @@
-import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert, ScrollView } from "react-native";
 import { useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAddHistoryRecord } from "../../../hooks/useHistory";
+import { usePetById } from "../../../hooks/usePets";
 import CustomButton from "../../../components/CustomButton";
 import BackButton from "../../../components/BackButton";
+import ReminderFields from "../../../components/ReminderFields";
 import { ThemeColors } from "../../../constants/colors";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { useThemedStyles } from "../../../hooks/useThemedStyles";
 import { SPACING, RADIUS } from "../../../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../../../constants/typography";
+import { resolveReminderInput, getReminderFeedback } from "../../../utils/reminder";
 
 type FocusableField = "description" | "date";
 
@@ -18,10 +21,13 @@ export default function CreateHistoryRecord() {
     const styles = useThemedStyles(createStyles);
 
     const { petId } = useLocalSearchParams<{ petId: string }>();
+    const pet = usePetById(petId);
     const addRecord = useAddHistoryRecord();
 
     const [description, setDescription] = useState("");
     const [date, setDate] = useState(new Date().toLocaleDateString("pt-BR"));
+    const [reminderDate, setReminderDate] = useState("");
+    const [reminderTime, setReminderTime] = useState("");
     const [focusedField, setFocusedField] = useState<FocusableField | null>(null);
 
     async function handleSave() {
@@ -31,17 +37,29 @@ export default function CreateHistoryRecord() {
             return;
         }
 
+        const reminder = resolveReminderInput(reminderDate, reminderTime);
+
+        if (!reminder.ok) {
+            Alert.alert("Lembrete inválido", reminder.message);
+            return;
+        }
+
         try {
-            await addRecord.mutateAsync({
+            const result = await addRecord.mutateAsync({
                 petId,
+                petName: pet?.name ?? "seu pet",
                 description: description.trim(),
-                date: date.trim()
+                date: date.trim(),
+                reminderAt: reminder.reminderAt
             });
 
-            Alert.alert(
-                "Sucesso",
-                "Registro salvo com sucesso"
+            const feedback = getReminderFeedback(
+                "Registro salvo com sucesso",
+                result,
+                reminder.reminderAt
             );
+
+            Alert.alert(feedback.title, feedback.message);
 
             router.back();
         } catch (error) {
@@ -55,7 +73,10 @@ export default function CreateHistoryRecord() {
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView
+            contentContainerStyle={styles.container}
+            keyboardShouldPersistTaps="handled"
+        >
             <BackButton />
 
             <Text style={styles.title}>
@@ -104,6 +125,14 @@ export default function CreateHistoryRecord() {
                     editable={!addRecord.isPending}
                 />
 
+                <ReminderFields
+                    date={reminderDate}
+                    time={reminderTime}
+                    onChangeDate={setReminderDate}
+                    onChangeTime={setReminderTime}
+                    editable={!addRecord.isPending}
+                />
+
             </View>
 
             <View style={styles.previewCard}>
@@ -122,6 +151,13 @@ export default function CreateHistoryRecord() {
                     <Text style={styles.previewValue}>{date || "—"}</Text>
                 </View>
 
+                <View style={styles.previewRow}>
+                    <Text style={styles.previewLabel}>Lembrete</Text>
+                    <Text style={styles.previewValue}>
+                        {reminderDate || reminderTime ? `${reminderDate} ${reminderTime}`.trim() : "—"}
+                    </Text>
+                </View>
+
             </View>
 
             <CustomButton
@@ -129,13 +165,13 @@ export default function CreateHistoryRecord() {
                 onPress={handleSave}
                 loading={addRecord.isPending}
             />
-        </View>
+        </ScrollView>
     );
 }
 
 const createStyles = (colors: ThemeColors) => StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         padding: SPACING.lg,
         backgroundColor: colors.background
     },
