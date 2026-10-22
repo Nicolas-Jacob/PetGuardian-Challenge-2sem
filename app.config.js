@@ -19,7 +19,8 @@ module.exports = () => {
             userInterfaceStyle: "automatic",
             plugins: [
                 "expo-router",
-                "expo-status-bar"
+                "expo-status-bar",
+                "expo-notifications"
             ],
             experiments: {
                 typedRoutes: true
