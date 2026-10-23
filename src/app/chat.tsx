@@ -2,9 +2,12 @@ import { useRef, useState } from "react";
 import { View, Text, TextInput, StyleSheet, ScrollView, ScrollViewInstance, TouchableOpacity } from "react-native";
 import CustomButton from "../components/CustomButton";
 import BackButton from "../components/BackButton";
+import ChatSuggestions from "../components/ChatSuggestions";
 import { ThemeColors } from "../constants/colors";
 import { useTheme } from "../contexts/ThemeContext";
 import { useThemedStyles } from "../hooks/useThemedStyles";
+import { useChatData } from "../hooks/useChatData";
+import { generateChatReply } from "../utils/chatEngine";
 import { SPACING, RADIUS, SHADOWS } from "../constants/spacing";
 import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../constants/typography";
 
@@ -14,45 +17,13 @@ interface ChatMessage {
     text: string;
 }
 
-function getAiResponse(question: string): string {
-
-    if (question.includes("vacina") || question.includes("vacinar")) {
-        return "As vacinas ajudam a prevenir doenças graves. Filhotes costumam receber várias doses nos primeiros meses de vida e depois reforços periódicos.";
-    } else if (
-        question.includes("ração") ||
-        question.includes("alimentação") ||
-        question.includes("comida")
-    ) {
-        return "Uma alimentação equilibrada é fundamental. Utilize rações adequadas para idade, porte e necessidades específicas do pet.";
-    } else if (question.includes("água") || question.includes("hidrat")) {
-        return "Água limpa deve estar disponível o tempo todo. A hidratação ajuda no funcionamento dos órgãos e na saúde geral do pet.";
-    } else if (
-        question.includes("sem comer") ||
-        question.includes("não come") ||
-        question.includes("apetite")
-    ) {
-        return "Perda de apetite pode ocorrer por diversos motivos. Observe outros sintomas e procure orientação veterinária se persistir.";
-    } else if (
-        question.includes("vomitando") ||
-        question.includes("vômito")
-    ) {
-        return "Vômitos ocasionais podem acontecer, mas episódios repetidos podem indicar problemas digestivos ou outras condições.";
-    } else if (
-        question.includes("veterinário") ||
-        question.includes("consulta")
-    ) {
-        return "Consultas preventivas ajudam a identificar problemas antes que se tornem graves. A frequência pode variar conforme a idade do pet.";
-    } else if (question.includes("banho")) {
-        return "A frequência do banho depende da raça, tipo de pelo e rotina do pet. Banhos excessivos podem remover a proteção natural da pele.";
-    } else if (
-        question.includes("cansado") ||
-        question.includes("sono")
-    ) {
-        return "Cansaço pode ser normal após atividades físicas, mas mudanças frequentes de comportamento merecem atenção.";
-    }
-
-    return "Não encontrei uma resposta específica. Recomendamos acompanhamento veterinário periódico.";
-}
+// Atalhos para as perguntas que usam os dados do usuário
+const QUICK_SUGGESTIONS = [
+    "Meus pets",
+    "Próximo lembrete",
+    "Última vacina",
+    "Resumo do histórico"
+];
 
 export default function Chat() {
 
@@ -63,6 +34,8 @@ export default function Chat() {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputFocused, setInputFocused] = useState(false);
     const scrollViewRef = useRef<ScrollViewInstance>(null);
+
+    const { pets, history, status } = useChatData();
 
     const suggestions = [
         "Quando devo vacinar meu pet?",
@@ -75,15 +48,20 @@ export default function Chat() {
         "Meu pet está muito cansado"
     ];
 
-    function handleSend() {
+    // Caminho único de envio: texto digitado e atalhos passam por aqui
+    function sendMessage(text: string) {
 
-        if (!message.trim()) {
+        if (!text.trim()) {
             return;
         }
 
-        const userText = message.trim();
-        const question = userText.toLowerCase();
-        const aiText = getAiResponse(question);
+        const userText = text.trim();
+        const aiText = generateChatReply(userText, {
+            pets,
+            history,
+            now: new Date(),
+            dataStatus: status
+        });
         const timestamp = Date.now();
 
         setMessages((previous) => [
@@ -92,9 +70,17 @@ export default function Chat() {
             ...previous
         ]);
 
-        setMessage("");
-
         scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    }
+
+    function handleSend() {
+
+        if (!message.trim()) {
+            return;
+        }
+
+        sendMessage(message);
+        setMessage("");
     }
 
     return (
@@ -118,6 +104,9 @@ export default function Chat() {
                         </Text>
                         <Text style={styles.emptyChatText}>
                             Faça uma pergunta para começar
+                        </Text>
+                        <Text style={styles.emptyChatHint}>
+                            Além de dicas de cuidados, posso consultar seus pets, os próximos lembretes, a última vacina e o resumo do histórico clínico.
                         </Text>
                     </View>
 
@@ -159,6 +148,11 @@ export default function Chat() {
 
                 )}
             </View>
+
+            <ChatSuggestions
+                suggestions={QUICK_SUGGESTIONS}
+                onSelect={sendMessage}
+            />
 
             <TextInput
                 style={[styles.input, inputFocused && styles.inputFocused]}
@@ -236,6 +230,14 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     emptyChatText: {
         fontSize: FONT_SIZE.body,
         color: colors.textSecondary
+    },
+
+    emptyChatHint: {
+        fontSize: FONT_SIZE.caption,
+        color: colors.textSecondary,
+        textAlign: "center",
+        marginTop: SPACING.sm,
+        lineHeight: 18
     },
 
     bubbleRow: {
