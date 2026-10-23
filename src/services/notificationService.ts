@@ -127,6 +127,27 @@ export async function cancelAllHistoryReminders(): Promise<void> {
     }
 }
 
+// Remove da bandeja os lembretes de histórico já exibidos. Usada só no logout:
+// no login ela apagaria notificações legítimas do próprio usuário.
+export async function dismissPresentedHistoryReminders(): Promise<void> {
+    try {
+        const presented = await Notifications.getPresentedNotificationsAsync();
+
+        const reminders = presented.filter((notification) =>
+            notification.request.identifier.startsWith(REMINDER_ID_PREFIX) ||
+            notification.request.content.data?.type === "history-reminder"
+        );
+
+        await Promise.all(
+            reminders.map((notification) =>
+                Notifications.dismissNotificationAsync(notification.request.identifier)
+            )
+        );
+    } catch (error) {
+        console.warn("Não foi possível remover os lembretes exibidos.", error);
+    }
+}
+
 // Função pura: só interpreta o toque, não navega
 export function parseNotificationTarget(
     response: Notifications.NotificationResponse

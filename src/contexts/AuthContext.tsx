@@ -7,7 +7,8 @@ import {
     User
 } from "firebase/auth";
 import { auth } from "../services/firebaseConfig";
-import { cancelAllHistoryReminders } from "../services/notificationService";
+import { cancelAllHistoryReminders, dismissPresentedHistoryReminders } from "../services/notificationService";
+import { stopReminderSync } from "../services/reminderSyncService";
 
 interface AuthContextData {
     user: User | null;
@@ -83,7 +84,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function signOut() {
         // Lembretes deste usuário não podem disparar para o próximo que entrar no aparelho
         try {
+            // Para a sincronização antes de cancelar, para ela não reagendar depois
+            stopReminderSync();
             await cancelAllHistoryReminders();
+            await dismissPresentedHistoryReminders();
         } catch (error) {
             console.warn("Falha ao cancelar lembretes no logout.", error);
         }
