@@ -62,7 +62,7 @@ export function getReminderFeedback(
     if (result.reminderRequested) {
         return {
             title: "Registro salvo",
-            message: "O registro foi salvo, mas o lembrete não foi agendado por falta de permissão de notificação. Ative as notificações do app nas configurações do aparelho."
+            message: "Registro salvo, mas não foi possível agendar o lembrete. Verifique se as notificações estão permitidas para o app."
         };
     }
 
