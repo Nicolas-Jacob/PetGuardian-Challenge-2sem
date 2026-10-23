@@ -66,7 +66,7 @@ export default function Login() {
             </Text>
 
             <Text style={styles.subtitle}>
-                Seu assistente inteligente para cuidados preventivos do seu pet
+                Seu app para cuidados preventivos do seu pet
             </Text>
 
             <View style={styles.form}>
