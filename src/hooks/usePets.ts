@@ -49,25 +49,33 @@ export function useDeletePet() {
 
     return useResourceMutation(
         async (uid, petId: string) => {
+            try {
+                // Remove o histórico antes do pet para não deixar registros nem lembretes órfãos
+                const records = await getHistoryByPet(uid, petId);
 
-            // Remove o histórico antes do pet para não deixar registros nem lembretes órfãos
-            const records = await getHistoryByPet(uid, petId);
+                const results = await Promise.allSettled(
+                    records.map(async (record) => {
+                        await deleteHistoryRecord(uid, record.id);
 
-            await Promise.all(
-                records.map((record) =>
-                    cancelHistoryReminder(record.id).catch((error) => {
-                        console.warn(`Não foi possível cancelar o lembrete ${record.id}.`, error);
+                        // Só cancela o lembrete de um registro que realmente saiu do Firestore
+                        await cancelHistoryReminder(record.id).catch((error) => {
+                            console.warn(`Não foi possível cancelar o lembrete ${record.id}.`, error);
+                        });
                     })
-                )
-            );
+                );
 
-            await Promise.all(
-                records.map((record) => deleteHistoryRecord(uid, record.id))
-            );
+                const failure = results.find(
+                    (result): result is PromiseRejectedResult => result.status === "rejected"
+                );
 
-            await deletePet(uid, petId);
+                // Algum registro ficou: o pet não pode ser excluído
+                if (failure) throw failure.reason;
 
-            queryClient.invalidateQueries({ queryKey: ["history", uid, petId] });
+                await deletePet(uid, petId);
+            } finally {
+                // Reflete o estado real do histórico mesmo quando a exclusão falha
+                queryClient.invalidateQueries({ queryKey: ["history", uid, petId] });
+            }
         },
         (uid) => ["pets", uid]
     );
