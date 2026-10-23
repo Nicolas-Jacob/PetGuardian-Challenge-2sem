@@ -19,6 +19,10 @@ export function useNotificationNavigation() {
     const pendingTargetRef = useRef<NotificationTarget | null>(null);
     const canNavigateRef = useRef(false);
 
+    // null até o primeiro usuário ser carregado
+    const previousUidRef = useRef<string | null>(null);
+    const uid = user?.uid ?? null;
+
     // Só navega com sessão resolvida, navegador montado e fora do fluxo de login.
     // segments vazio é a rota index, que ainda vai redirecionar para /home.
     const canNavigate =
@@ -43,6 +47,20 @@ export function useNotificationNavigation() {
                 : { petId: target.petId }
         });
     }, [router]);
+
+    // Destino pendente pertence à sessão em que o toque ocorreu: descarta no logout
+    // ou na troca de usuário. Antes do primeiro login (cold start sem sessão) mantém.
+    useEffect(() => {
+
+        const previousUid = previousUidRef.current;
+
+        if (previousUid !== null && previousUid !== uid) {
+            pendingTargetRef.current = null;
+        }
+
+        previousUidRef.current = uid;
+
+    }, [uid]);
 
     useEffect(() => {
         canNavigateRef.current = canNavigate;
