@@ -1,62 +1,38 @@
-import { View, Text, TextInput, StyleSheet, Alert, ScrollView } from "react-native";
-import { useState } from "react";
+import { Text, StyleSheet, Alert, ScrollView } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAddHistoryRecord } from "../../../hooks/useHistory";
 import { usePetById } from "../../../hooks/usePets";
-import CustomButton from "../../../components/CustomButton";
 import BackButton from "../../../components/BackButton";
-import ReminderFields from "../../../components/ReminderFields";
+import HistoryRecordForm from "../../../components/HistoryRecordForm";
 import { ThemeColors } from "../../../constants/colors";
-import { useTheme } from "../../../contexts/ThemeContext";
 import { useThemedStyles } from "../../../hooks/useThemedStyles";
-import { SPACING, RADIUS } from "../../../constants/spacing";
-import { FONT_SIZE, FONT_WEIGHT, TYPOGRAPHY } from "../../../constants/typography";
-import { resolveReminderInput, getReminderFeedback } from "../../../utils/reminder";
-
-type FocusableField = "description" | "date";
+import { SPACING } from "../../../constants/spacing";
+import { FONT_SIZE, TYPOGRAPHY } from "../../../constants/typography";
+import { getReminderFeedback } from "../../../utils/reminder";
+import { emptyHistoryRecordFormValues, HistoryRecordFormData } from "../../../utils/historyRecordValidation";
 
 export default function CreateHistoryRecord() {
 
-    const { colors } = useTheme();
     const styles = useThemedStyles(createStyles);
 
     const { petId } = useLocalSearchParams<{ petId: string }>();
     const pet = usePetById(petId);
     const addRecord = useAddHistoryRecord();
 
-    const [description, setDescription] = useState("");
-    const [date, setDate] = useState(new Date().toLocaleDateString("pt-BR"));
-    const [reminderDate, setReminderDate] = useState("");
-    const [reminderTime, setReminderTime] = useState("");
-    const [focusedField, setFocusedField] = useState<FocusableField | null>(null);
-
-    async function handleSave() {
-
-        if (!description.trim() || !date.trim()) {
-            Alert.alert("Erro", "Preencha todos os campos");
-            return;
-        }
-
-        const reminder = resolveReminderInput(reminderDate, reminderTime);
-
-        if (!reminder.ok) {
-            Alert.alert("Lembrete inválido", reminder.message);
-            return;
-        }
-
+    async function handleSubmit({ description, date, reminderAt }: HistoryRecordFormData) {
         try {
             const result = await addRecord.mutateAsync({
                 petId,
                 petName: pet?.name ?? "seu pet",
-                description: description.trim(),
-                date: date.trim(),
-                reminderAt: reminder.reminderAt
+                description,
+                date,
+                reminderAt
             });
 
             const feedback = getReminderFeedback(
                 "Registro salvo com sucesso",
                 result,
-                reminder.reminderAt
+                reminderAt
             );
 
             Alert.alert(feedback.title, feedback.message);
@@ -87,83 +63,11 @@ export default function CreateHistoryRecord() {
                 Registre uma vacina, consulta ou exame
             </Text>
 
-            <View style={styles.form}>
-
-                <Text style={styles.label}>
-                    Descrição
-                </Text>
-
-                <TextInput
-                    style={[
-                        styles.input,
-                        focusedField === "description" && styles.inputFocused
-                    ]}
-                    placeholder="Ex: Vacina V10 aplicada"
-                    placeholderTextColor={colors.placeholder}
-                    value={description}
-                    onChangeText={setDescription}
-                    onFocus={() => setFocusedField("description")}
-                    onBlur={() => setFocusedField(null)}
-                    editable={!addRecord.isPending}
-                />
-
-                <Text style={styles.label}>
-                    Data
-                </Text>
-
-                <TextInput
-                    style={[
-                        styles.input,
-                        focusedField === "date" && styles.inputFocused
-                    ]}
-                    placeholder="dd/mm/aaaa"
-                    placeholderTextColor={colors.placeholder}
-                    value={date}
-                    onChangeText={setDate}
-                    onFocus={() => setFocusedField("date")}
-                    onBlur={() => setFocusedField(null)}
-                    editable={!addRecord.isPending}
-                />
-
-                <ReminderFields
-                    date={reminderDate}
-                    time={reminderTime}
-                    onChangeDate={setReminderDate}
-                    onChangeTime={setReminderTime}
-                    editable={!addRecord.isPending}
-                />
-
-            </View>
-
-            <View style={styles.previewCard}>
-
-                <Text style={styles.previewTitle}>
-                    Pré-visualização
-                </Text>
-
-                <View style={styles.previewRow}>
-                    <Text style={styles.previewLabel}>Descrição</Text>
-                    <Text style={styles.previewValue}>{description || "—"}</Text>
-                </View>
-
-                <View style={styles.previewRow}>
-                    <Text style={styles.previewLabel}>Data</Text>
-                    <Text style={styles.previewValue}>{date || "—"}</Text>
-                </View>
-
-                <View style={styles.previewRow}>
-                    <Text style={styles.previewLabel}>Lembrete</Text>
-                    <Text style={styles.previewValue}>
-                        {reminderDate || reminderTime ? `${reminderDate} ${reminderTime}`.trim() : "—"}
-                    </Text>
-                </View>
-
-            </View>
-
-            <CustomButton
-                title="Salvar"
-                onPress={handleSave}
+            <HistoryRecordForm
+                initialValues={emptyHistoryRecordFormValues()}
+                submitLabel="Salvar"
                 loading={addRecord.isPending}
+                onSubmit={handleSubmit}
             />
         </ScrollView>
     );
@@ -187,65 +91,5 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
         fontSize: FONT_SIZE.body,
         color: colors.textSecondary,
         marginBottom: SPACING.lg
-    },
-
-    form: {
-        marginBottom: SPACING.xs
-    },
-
-    label: {
-        fontSize: FONT_SIZE.caption,
-        fontWeight: FONT_WEIGHT.semibold,
-        color: colors.textSecondary,
-        marginBottom: SPACING.xs,
-        marginLeft: SPACING.xs
-    },
-
-    input: {
-        backgroundColor: colors.inputBackground,
-        borderWidth: 1.5,
-        borderColor: colors.border,
-        padding: SPACING.md,
-        borderRadius: RADIUS.md,
-        marginBottom: SPACING.md,
-        fontSize: FONT_SIZE.body,
-        color: colors.text
-    },
-
-    inputFocused: {
-        borderColor: colors.primary,
-        backgroundColor: colors.primaryMuted
-    },
-
-    previewCard: {
-        backgroundColor: colors.card,
-        padding: SPACING.lg,
-        borderRadius: RADIUS.lg,
-        marginVertical: SPACING.lg
-    },
-
-    previewTitle: {
-        fontSize: FONT_SIZE.caption,
-        fontWeight: FONT_WEIGHT.bold,
-        color: colors.textSecondary,
-        marginBottom: SPACING.sm,
-        textTransform: "uppercase"
-    },
-
-    previewRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingVertical: SPACING.xs
-    },
-
-    previewLabel: {
-        fontSize: FONT_SIZE.body,
-        color: colors.textSecondary
-    },
-
-    previewValue: {
-        fontSize: FONT_SIZE.body,
-        fontWeight: FONT_WEIGHT.semibold,
-        color: colors.text
     }
 });
