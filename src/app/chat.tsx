@@ -88,11 +88,11 @@ export default function Chat() {
             <BackButton />
 
             <Text style={styles.title}>
-                Chat IA
+                Chat de Cuidados
             </Text>
 
             <Text style={styles.subtitle}>
-                Tire dúvidas sobre cuidados com pets
+                Tire dúvidas de cuidados e consulte seus pets e lembretes
             </Text>
 
             <View style={styles.chatArea}>

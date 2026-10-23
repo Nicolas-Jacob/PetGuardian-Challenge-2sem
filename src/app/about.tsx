@@ -62,7 +62,7 @@ export default function About() {
 
             <View style={styles.card}>
                 <Text style={styles.description}>
-                    O PetGuardian AI ajuda tutores a organizar o acompanhamento preventivo da saúde de seus animais de estimação. É possível cadastrar pets, registrar e consultar o histórico clínico de cada um (vacinas, consultas, exames) e tirar dúvidas rápidas sobre cuidados básicos em um chat de orientação, com dados sincronizados na nuvem via Firebase.
+                    O PetGuardian AI ajuda tutores a organizar o acompanhamento preventivo da saúde de seus animais de estimação. É possível cadastrar pets, registrar e consultar o histórico clínico de cada um (vacinas, consultas, exames) e usar o Chat de Cuidados, que responde por regras a dúvidas básicas e consulta seus pets, lembretes e histórico, com dados sincronizados na nuvem via Firebase.
                 </Text>
             </View>
 

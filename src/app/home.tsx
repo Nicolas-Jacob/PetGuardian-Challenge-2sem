@@ -203,7 +203,7 @@ export default function Home() {
                 </View>
 
                 <Text style={styles.navLabel}>
-                    Chat IA
+                    Chat de Cuidados
                 </Text>
 
                 <Text style={styles.navChevron}>
