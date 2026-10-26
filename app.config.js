@@ -58,7 +58,10 @@ module.exports = () => {
                 typedRoutes: true
             },
             extra: {
-                commitHash
+                commitHash,
+                eas: {
+                    projectId: "36970556-3e16-49d2-a247-09fbbcaa53d3"
+                }
             }
         }
     };
